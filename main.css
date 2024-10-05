@@ -1,0 +1,14 @@
+html, body {
+    margin: 0;
+    height: 100%;
+}
+
+body {
+    font-family: sans-serif;
+}
+
+.board {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+}
