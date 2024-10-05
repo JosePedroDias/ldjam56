@@ -55,7 +55,7 @@ function renderPillCell(el, colorIdx) {
     return el;
 }
 
-function render(el, m, { bg, viruses, pills }) {
+function render(el, m, p, { bg, viruses, pills }) {
     const ctx = el.getContext('2d');
     ctx.drawImage(bg, 0, 0);
     m.entries().forEach(([[x, y], { color, kind }]) => {
@@ -70,7 +70,7 @@ function render(el, m, { bg, viruses, pills }) {
     });
 }
 
-export function setupRender(m) {
+export function setupRender(m, p) {
     // prepare static textures
     const sprites = {
         bg: renderBg(createCanvas([m.w, m.h]), m),
@@ -90,7 +90,7 @@ export function setupRender(m) {
     const mainEl = createCanvas([m.w, m.h], true);
     
     // setup refresh function
-    const refresh = () => render(mainEl, m, sprites);
+    const refresh = () => render(mainEl, m, p, sprites);
 
     return [mainEl, refresh];
 }

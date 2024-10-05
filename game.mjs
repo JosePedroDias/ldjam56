@@ -9,7 +9,7 @@ let refresh;
 export async function play() {
     [m, p] = createGame();
 
-    const [mainEl, _refresh] = setupRender(m);
+    const [mainEl, _refresh] = setupRender(m, p);
     refresh = _refresh;
     
     mainEl.className = 'board';
