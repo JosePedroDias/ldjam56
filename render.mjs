@@ -58,12 +58,30 @@ function renderPillCell(el, colorIdx) {
 function render(el, m, p, { bg, viruses, pills }) {
     const ctx = el.getContext('2d');
     ctx.drawImage(bg, 0, 0);
-    m.entries().forEach(([[x, y], { color, kind }]) => {
+    //ctx.globalAlpha = 0.2;
+    m.entries().forEach(([[x, y], { color, kind, rotation }]) => {
         x *= S;
         y *= S;
         try {
-        if      (kind === KIND_VIRUS) ctx.drawImage(viruses[color], x, y);
-        else if (kind === KIND_PILL)  ctx.drawImage(  pills[color], x, y);
+            if (kind === KIND_VIRUS) {
+                ctx.drawImage(viruses[color], x, y);
+            } else if (kind === KIND_PILL) {
+                // TODO rotation
+                ctx.drawImage(  pills[color], x, y);
+            }
+        } catch (err) {
+            debugger;
+        }
+    });
+    //ctx.globalAlpha = 1;
+    p.m.entries().forEach(([[x_, y_], { color, kind, rotation }]) => {
+        const x = S * (x_ + p.pos[0]);
+        const y = S * (y_ + p.pos[1]);
+        try {
+            if (kind === KIND_PILL) {
+                // TODO rotation
+                ctx.drawImage(  pills[color], x, y);
+            }
         } catch (err) {
             debugger;
         }

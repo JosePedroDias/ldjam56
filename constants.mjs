@@ -22,9 +22,5 @@ export const COLORS = [
 export const KEY_LEFT = 'ArrowLeft';
 export const KEY_RIGHT = 'ArrowRight';
 export const KEY_DOWN = 'ArrowDown';
-export const KEY_A = 'a';
-export const KEY_B = 'b';
-
-export const LEVELS = [
-
-];
+export const KEY_A = 'z';
+export const KEY_B = 'x';

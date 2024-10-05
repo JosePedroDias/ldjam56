@@ -1,5 +1,5 @@
-import { KEY_A, KEY_DOWN, KEY_LEFT, KEY_RIGHT, S } from './constants.mjs';
-import { createGame } from './logic.mjs';
+import { KEY_LEFT, KEY_RIGHT, KEY_DOWN, KEY_A, KEY_B, S } from './constants.mjs';
+import { createGame, moveLeft, moveRight, drop, rotateCW, rotateCCW } from './logic.mjs';
 import { setupRender } from './render.mjs';
 
 let m;
