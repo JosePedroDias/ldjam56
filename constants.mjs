@@ -24,3 +24,4 @@ export const KEY_RIGHT = 'ArrowRight';
 export const KEY_DOWN = 'ArrowDown';
 export const KEY_A = 'z';
 export const KEY_B = 'x';
+export const KEY_DROP = ' ';

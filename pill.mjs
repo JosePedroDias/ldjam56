@@ -53,4 +53,22 @@ export class Pill {
     rotateCCW() {
         this._rotate(-1);
     }
+
+    isLeftmost([x, y]) {
+        if (this.rotation % 2 === 0) return false; // odds are horizontal
+        if (this.m.getValue([0, 1]).kind === KIND_EMPTY) return x === 1 && y === 1;
+        return x === 0 && y === 1;
+    }
+
+    isRightmost([x, y]) {
+        if (this.rotation % 2 === 0) return false; // odds are horizontal
+        if (this.m.getValue([2, 1]).kind === KIND_EMPTY) return x === 1 && y === 1;
+        return x === 2 && y === 1;
+    }
+
+    isBottommost([x, y]) {
+        if (this.rotation % 2 !== 0) return false; // evens are vertical
+        if (this.m.getValue([1, 2]).kind === KIND_EMPTY) return x === 1 && y === 1;
+        return x === 1 && y === 2;
+    }
 }

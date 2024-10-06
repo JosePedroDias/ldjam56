@@ -1,5 +1,5 @@
-import { KEY_LEFT, KEY_RIGHT, KEY_DOWN, KEY_A, KEY_B, S } from './constants.mjs';
-import { createGame, moveLeft, moveRight, drop, rotateCW, rotateCCW } from './logic.mjs';
+import { KEY_LEFT, KEY_RIGHT, KEY_DOWN, KEY_A, KEY_B, KEY_DROP, S } from './constants.mjs';
+import { createGame, moveLeft, moveRight, moveDown, drop, rotateCW, rotateCCW } from './logic.mjs';
 import { setupRender } from './render.mjs';
 
 let m;
@@ -29,7 +29,8 @@ export async function play() {
         const key = ev.key;
         if      (key === KEY_LEFT)  moveLeft(m, p);
         else if (key === KEY_RIGHT) moveRight(m, p);
-        else if (key === KEY_DOWN)  drop(m, p);
+        else if (key === KEY_DOWN)  moveDown(m, p);
+        else if (key === KEY_DROP)  drop(m, p);
         else if (key === KEY_A)     rotateCW(m, p);
         else if (key === KEY_B)     rotateCCW(m, p);
         else return;

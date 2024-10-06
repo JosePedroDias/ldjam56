@@ -23,22 +23,79 @@ export function createGame() {
     return [m, p];
 }
 
+function getPillCollisions(m, p) {
+    const result = [];
+    p.m.entries().forEach(([[x_, y_], { kind }]) => {
+        const x = (x_ + p.pos[0]);
+        const y = (y_ + p.pos[1]);
+        if (kind === KIND_PILL) {
+            if (!m.positionExists([x, y])) {
+                result.push([x_, y_]); //console.warn('out of bounds', x, y);
+            } else {
+                const v = m.getValue([x, y]);
+                if (v.kind !== KIND_EMPTY) result.push([x_, y_]); //console.warn('collision', x, y, v);
+                //else console.warn('ok', x, y);
+            }
+        }
+    });
+    return result;
+}
+
+function isPillColliding(m, p) {
+    return getPillCollisions(m, p).length > 0;
+}
+
 export function moveLeft(m, p) {
     p.pos[0] -= 1;
+    const collided = isPillColliding(m, p);
+    if (collided) p.pos[0] += 1;
+    return collided;
 }
 
 export function moveRight(m, p) {
     p.pos[0] += 1;
+    const collided = isPillColliding(m, p);
+    if (collided) p.pos[0] -= 1;
+    return collided;
+}
+
+function moveUp(m, p) {
+    p.pos[1] -= 1;
+    const collided = isPillColliding(m, p);
+    if (collided) p.pos[1] += 1;
+    return collided;
+}
+
+export function moveDown(m, p) {
+    p.pos[1] += 1;
+    const collided = isPillColliding(m, p);
+    if (collided) p.pos[1] -= 1;
+    return collided;
 }
 
 export function drop(m, p) {
-    p.pos[1] += 1;
+    do {
+        p.pos[1] += 1;
+    } while (!isPillColliding(m, p));
+    p.pos[1] -= 1;
+}
+
+function rotate(m, p, isCW) {
+    if (isCW) p.rotateCW();
+    else      p.rotateCCW();
+    const colls = getPillCollisions(m, p);
+    const leftC   = colls.some((pos) => p.isLeftmost(pos));
+    const rightC  = colls.some((pos) => p.isRightmost(pos));
+    const bottomC = colls.some((pos) => p.isBottommost(pos));
+    if ( leftC && !rightC && !bottomC) { moveRight(m, p); }
+    if (!leftC &&  rightC && !bottomC) { moveLeft(m, p);  }
+    if (!leftC && !rightC &&  bottomC) { moveUp(m, p);    }
 }
 
 export function rotateCW(m, p) {
-    p.rotateCW();
+    rotate(m, p, true);
 }
 
 export function rotateCCW(m, p) {
-    p.rotateCCW();
+    rotate(m, p, false);
 }
