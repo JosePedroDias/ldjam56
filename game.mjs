@@ -2,10 +2,10 @@ import { KEY_LEFT, KEY_RIGHT, KEY_DOWN, KEY_A, KEY_B, KEY_DROP, S } from './cons
 import { createGame, moveLeft, moveRight, moveDown, drop, rotateCW, rotateCCW, applyPill } from './logic.mjs';
 import { setupRender } from './render.mjs';
 
-let m, p;
-let refresh;
+let m, p, refresh;
 let speedMs = 1500;
 let lastMoveT = Date.now();
+let isGameOver = false;
 
 export async function play() {
     [m, p] = createGame();
@@ -44,10 +44,16 @@ export async function play() {
 
 
     const onTick = () => {
+        if (isGameOver) {
+            window.alert('game over');
+            return;
+        }
         requestAnimationFrame(onTick);
         const t = Date.now();
         if (t - lastMoveT >= speedMs) {
-            if (moveDown(m, p)) applyPill(m, p);
+            if (moveDown(m, p)) {
+                isGameOver = applyPill(m, p);
+            }
             refresh();
             lastMoveT = t;
         }

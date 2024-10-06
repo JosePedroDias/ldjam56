@@ -18,6 +18,7 @@ export class Pill {
             return new Cell(color, kind, rotation);
         });
         this.rotateCW();
+        //++this.pos[1];
     }
 
     _rotate(dir) {

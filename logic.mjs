@@ -59,6 +59,8 @@ export function applyPill(m, p) {
 
     // reset new pill
     p.restore(randomPill());
+    
+    return isPillColliding(m, p);
 }
 
 export function moveLeft(m, p) {

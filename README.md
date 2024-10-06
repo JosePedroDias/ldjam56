@@ -1,7 +1,7 @@
 # LDJAM56
 
-Implemented in vanilla js and rendered in canvas.  
-Super early WIP. May lead nowhere!
+Inspired by Nintendo's Dr Mario.  
+Implemented in vanilla js and rendered using canvas API.  
 
 
 ## controls
@@ -20,13 +20,14 @@ Super early WIP. May lead nowhere!
     - https://simon.html5.org/dump/html5-canvas-cheat-sheet.html
 
 
-## todo
+## TODO
 
-- rotate piece
-- move piece
-- drop piece
 - detect cells to remove
+- generate decent level
+- hint leaving cells visually
 - display next piece
 - count viruses left
-- detect end of game
-- port to go/nakama
+- gamepad support
+- twist from original game?
+- actual sprites instead of geometric figures?
+- port to go/nakama or use peerjs to do multiplayer
