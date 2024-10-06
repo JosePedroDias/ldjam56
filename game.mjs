@@ -3,7 +3,7 @@ import {
     GP_LEFT, GP_RIGHT, GP_DOWN, GP_DROP, GP_ROT_CW, GP_ROT_CCW,
     S,
 } from './constants.mjs';
-import { createGame, moveLeft, moveRight, moveDown, drop, rotateCW, rotateCCW, applyPill } from './logic.mjs';
+import { createGame, moveLeft, moveRight, moveDown, drop, rotateCW, rotateCCW, applyPill, markCellsToDelete } from './logic.mjs';
 import { setupRender } from './render.mjs';
 import { setupGamepad, rebindGamepad, getGamepadBindings, setGamepadBindings, subscribeToGamepadEvents, subscribeToGamepadBindingMessages } from './gamepad.mjs';
 
@@ -28,7 +28,7 @@ export async function play() {
         if      (key === KEY_LEFT)    moveLeft(m, p);
         else if (key === KEY_RIGHT)   moveRight(m, p);
         else if (key === KEY_DOWN)    moveDown(m, p);
-        else if (key === KEY_DROP)    drop(m, p);
+        else if (key === KEY_DROP)    { drop(m, p); lastMoveT = Date.now() - speedMs; }
         else if (key === KEY_ROT_CW)  rotateCW(m, p);
         else if (key === KEY_ROT_CCW) rotateCCW(m, p);
         else if (key === KEY_ROT_GP_REBIND) {
@@ -54,12 +54,20 @@ export async function play() {
         }
         requestAnimationFrame(onTick);
         const t = Date.now();
+
+        if (m.markCellsT && m.markCellsT < t) {
+            markCellsToDelete(m, p);
+        }
+
         if (t - lastMoveT >= speedMs) {
             if (moveDown(m, p)) {
                 isGameOver = applyPill(m, p);
             }
             refresh();
             lastMoveT = t;
+        } else {
+            const ratio = (t - lastMoveT) / speedMs;
+            refresh(ratio);
         }
     };
 
@@ -82,7 +90,7 @@ export async function play() {
         if      (action === GP_LEFT)    moveLeft(m, p);
         else if (action === GP_RIGHT)   moveRight(m, p);
         else if (action === GP_DOWN)    moveDown(m, p);
-        else if (action === GP_DROP)    drop(m, p);
+        else if (action === GP_DROP)    { drop(m, p); lastMoveT = Date.now() - speedMs; }
         else if (action === GP_ROT_CW)  rotateCW(m, p);
         else if (action === GP_ROT_CCW) rotateCCW(m, p);
         else return;

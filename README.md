@@ -29,10 +29,8 @@ Implemented in vanilla js and rendered using canvas API.
 
 ## TODO
 
-- properly remove cells
 - drop remaining ones
 - generate decent level
-- hint leaving cells visually
 - display next piece
 - count viruses left
 - gamepad: show gamepad messages using a dom element instead of console

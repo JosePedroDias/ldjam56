@@ -36,3 +36,5 @@ export const GP_ROT_CW  = 'rcw';
 export const GP_ROT_CCW = 'rccw';
 
 export const GP_ACTIONS = [ GP_LEFT, GP_RIGHT, GP_DOWN, GP_DROP, GP_ROT_CW, GP_ROT_CCW ];
+
+export const LEAVE_MS = 500;

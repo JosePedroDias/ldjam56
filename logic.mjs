@@ -1,4 +1,4 @@
-import { BOARD_H, BOARD_W, COLOR_NONE, KIND_VIRUS, KIND_EMPTY, KIND_PILL } from './constants.mjs';
+import { BOARD_H, BOARD_W, COLOR_NONE, KIND_VIRUS, KIND_EMPTY, KIND_PILL, LEAVE_MS } from './constants.mjs';
 import { rndF01, rndI } from './random.mjs';
 import { Matrix } from './matrix.mjs';
 import { Cell } from './cell.mjs';
@@ -69,6 +69,7 @@ export function moveLeft(m, p) {
     p.pos[0] -= 1;
     const collided = isPillColliding(m, p);
     if (collided) p.pos[0] += 1;
+    else canMoveDown(m, p);
     return collided;
 }
 
@@ -76,6 +77,7 @@ export function moveRight(m, p) {
     p.pos[0] += 1;
     const collided = isPillColliding(m, p);
     if (collided) p.pos[0] -= 1;
+    else canMoveDown(m, p);
     return collided;
 }
 
@@ -86,11 +88,18 @@ function moveUp(m, p) {
     return collided;
 }
 
-export function moveDown(m, p) {
+export function moveDown(m, p, isFake) {
     p.pos[1] += 1;
     const collided = isPillColliding(m, p);
     if (collided) p.pos[1] -= 1;
+    else if (!isFake) canMoveDown(m, p);
     return collided;
+}
+
+function canMoveDown(m, p) {
+    const cmd = !moveDown(m, p, true);
+    if (cmd) moveUp(m, p);
+    m.canMoveDown = cmd;
 }
 
 export function drop(m, p) {
@@ -121,6 +130,10 @@ export function rotateCCW(m, p) {
 }
 
 export function markCellsToDelete(m, p) {
+    delete m.markCellsT;
+
+    removeMarkedCells(m, p);
+
     const combos = [];
 
     for (let x = 0; x < m.w; ++x) {
@@ -162,22 +175,19 @@ export function markCellsToDelete(m, p) {
     }
 
     if (combos.length > 0) {
-        console.warn('combos', combos);
         combos.forEach((c) => {
             c.forEach((pos) => {
                 const v = m.getValue(pos);
                 v.toRemove();
             });
         });
-        // TODO HACkY
-        setTimeout(() => removeMarkedCells(m, p), 2000);
+        m.markCellsT = Date.now() + LEAVE_MS;
     }
 
     return combos.length > 0;
 }
 
 export function removeMarkedCells(m, p) {
-    console.log('to remove...');
     m.values().forEach((v) => {
         //console.log('v', v);
         v.clearLeaving();

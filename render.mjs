@@ -9,6 +9,8 @@ const rad180 = Math.PI;
 const rad90  = rad180 / 2;
 const rad360 = rad180 * 2;
 
+let r;
+
 function createCanvas([w, h], toAppend) {
     const el = document.createElement('canvas');
     el.setAttribute('width', S * w);
@@ -83,6 +85,11 @@ function drawRotated(ctx, sprite, [x, y], ninetyDegTimes) {
 }
 
 function render(el, m, p, { bg, viruses, pills }) {
+    let rr = 0;
+    if (r > 0.5 && m.canMoveDown) {
+        rr = 2 * (r - 0.5);
+    }
+
     const ctx = el.getContext('2d');
     ctx.clearRect(0, 0, S * m.w, S * m.h);
     ctx.drawImage(bg, 0, 0);
@@ -96,6 +103,8 @@ function render(el, m, p, { bg, viruses, pills }) {
             drawRotated(ctx, pills[color], [x, y], rotation);
         }
     });
+    ctx.save();
+    ctx.translate(0, S * rr);
     p.m.entries().forEach(([[x_, y_], { color, kind, rotation }]) => {
         const x = S * (x_ + p.pos[0]);
         const y = S * (y_ + p.pos[1]);
@@ -103,6 +112,7 @@ function render(el, m, p, { bg, viruses, pills }) {
             drawRotated(ctx, pills[color], [x, y], rotation);
         }
     });
+    ctx.restore();
 }
 
 export function setupRender(m, p) {
@@ -125,7 +135,12 @@ export function setupRender(m, p) {
     const mainEl = createCanvas([m.w, m.h], true);
     
     // setup refresh function
-    const refresh = () => render(mainEl, m, p, sprites);
+    const refresh = (r_) => {
+        if (r_ !== undefined) {
+            r = r_;
+        }
+        render(mainEl, m, p, sprites);
+    }
 
     return [mainEl, refresh];
 }
