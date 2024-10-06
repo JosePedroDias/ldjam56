@@ -19,9 +19,20 @@ export const COLORS = [
     'red',
 ];
 
-export const KEY_LEFT = 'ArrowLeft';
-export const KEY_RIGHT = 'ArrowRight';
-export const KEY_DOWN = 'ArrowDown';
-export const KEY_A = 'z';
-export const KEY_B = 'x';
-export const KEY_DROP = ' ';
+export const KEY_LEFT    = 'ArrowLeft';
+export const KEY_RIGHT   = 'ArrowRight';
+export const KEY_DOWN    = 'ArrowDown';
+export const KEY_DROP    = ' ';
+export const KEY_ROT_CW  = 'z';
+export const KEY_ROT_CCW = 'x';
+export const KEY_ROT_GP_REBIND = '1';
+// TODO keyboard rebind
+
+export const GP_LEFT    = 'left';
+export const GP_RIGHT   = 'right';
+export const GP_DOWN    = 'down';
+export const GP_DROP    = 'drop';
+export const GP_ROT_CW  = 'rcw';
+export const GP_ROT_CCW = 'rccw';
+
+export const GP_ACTIONS = [ GP_LEFT, GP_RIGHT, GP_DOWN, GP_DROP, GP_ROT_CW, GP_ROT_CCW ];

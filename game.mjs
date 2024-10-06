@@ -1,6 +1,11 @@
-import { KEY_LEFT, KEY_RIGHT, KEY_DOWN, KEY_A, KEY_B, KEY_DROP, S } from './constants.mjs';
+import {
+    KEY_LEFT, KEY_RIGHT, KEY_DOWN, KEY_DROP, KEY_ROT_CW, KEY_ROT_CCW, KEY_ROT_GP_REBIND,
+    GP_LEFT, GP_RIGHT, GP_DOWN, GP_DROP, GP_ROT_CW, GP_ROT_CCW,
+    S,
+} from './constants.mjs';
 import { createGame, moveLeft, moveRight, moveDown, drop, rotateCW, rotateCCW, applyPill } from './logic.mjs';
 import { setupRender } from './render.mjs';
+import { setupGamepad, rebindGamepad, getGamepadBindings, setGamepadBindings, subscribeToGamepadEvents, subscribeToGamepadBindingMessages } from './gamepad.mjs';
 
 let m, p, refresh;
 let speedMs = 1500;
@@ -17,23 +22,23 @@ export async function play() {
     mainEl.style.marginLeft = `-${S/2 * m.w}px`;
     mainEl.style.marginTop  = `-${S/2 * m.h}px`;
 
-    /*mainEl.addEventListener('click', (ev) => {
-        const geo = mainEl.getBoundingClientRect();
-        const x = Math.floor( (ev.clientX - geo.x) / S);
-        const y = Math.floor( (ev.clientY - geo.y) / S);
-        const pos = [x, y];
-        changeCell(pos);
-    });*/
-
     document.addEventListener('keydown', (ev) => {
         if (ev.altKey || ev.metaKey || ev.ctrlKey) return;
         const key = ev.key;
-        if      (key === KEY_LEFT)  moveLeft(m, p);
-        else if (key === KEY_RIGHT) moveRight(m, p);
-        else if (key === KEY_DOWN)  moveDown(m, p);
-        else if (key === KEY_DROP)  drop(m, p);
-        else if (key === KEY_A)     rotateCW(m, p);
-        else if (key === KEY_B)     rotateCCW(m, p);
+        if      (key === KEY_LEFT)    moveLeft(m, p);
+        else if (key === KEY_RIGHT)   moveRight(m, p);
+        else if (key === KEY_DOWN)    moveDown(m, p);
+        else if (key === KEY_DROP)    drop(m, p);
+        else if (key === KEY_ROT_CW)  rotateCW(m, p);
+        else if (key === KEY_ROT_CCW) rotateCCW(m, p);
+        else if (key === KEY_ROT_GP_REBIND) {
+            rebindGamepad().then(() => {
+                console.warn('bindings complete');
+                try {
+                    localStorage.setItem(GP_LS, JSON.stringify(getGamepadBindings()));
+                } catch (err) {}
+            });
+        }
         else return;
         ev.preventDefault();
         ev.stopPropagation();
@@ -41,7 +46,6 @@ export async function play() {
     });
 
     refresh();
-
 
     const onTick = () => {
         if (isGameOver) {
@@ -60,4 +64,29 @@ export async function play() {
     };
 
     onTick();
+
+    // gamepad wiring
+    const GP_LS = 'gamepad';
+    setupGamepad();
+
+    try {
+        let b = localStorage.getItem(GP_LS);
+        b = JSON.parse(b);
+        if (b) {
+            setGamepadBindings(b);
+            console.warn('gamepad bindings loaded');
+        }
+    } catch (err) {}
+
+    subscribeToGamepadEvents((action) => {
+        if      (action === GP_LEFT)    moveLeft(m, p);
+        else if (action === GP_RIGHT)   moveRight(m, p);
+        else if (action === GP_DOWN)    moveDown(m, p);
+        else if (action === GP_DROP)    drop(m, p);
+        else if (action === GP_ROT_CW)  rotateCW(m, p);
+        else if (action === GP_ROT_CCW) rotateCCW(m, p);
+        else return;
+        refresh();
+    });
+    subscribeToGamepadBindingMessages((m) => console.log(m));
 }

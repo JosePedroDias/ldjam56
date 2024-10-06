@@ -59,7 +59,7 @@ export function applyPill(m, p) {
 
     // reset new pill
     p.restore(randomPill());
-    
+
     return isPillColliding(m, p);
 }
 
@@ -116,4 +116,12 @@ export function rotateCW(m, p) {
 
 export function rotateCCW(m, p) {
     rotate(m, p, false);
+}
+
+export function markCellsToDelete(m, p) {
+
+}
+
+export function removeMarkedCells(m, p) {
+
 }
