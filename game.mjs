@@ -35,6 +35,7 @@ export async function play() {
         else return;
         ev.preventDefault();
         ev.stopPropagation();
+        refresh();
     });
 
     refresh();

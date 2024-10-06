@@ -84,6 +84,7 @@ function drawRotated(ctx, sprite, [x, y], ninetyDegTimes) {
 
 function render(el, m, p, { bg, viruses, pills }) {
     const ctx = el.getContext('2d');
+    ctx.clearRect(0, 0, S * m.w, S * m.h);
     ctx.drawImage(bg, 0, 0);
     m.entries().forEach(([[x, y], { color, kind, rotation }]) => {
         x *= S;

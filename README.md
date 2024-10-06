@@ -26,4 +26,7 @@ Super early WIP. May lead nowhere!
 - move piece
 - drop piece
 - detect cells to remove
+- display next piece
+- count viruses left
+- detect end of game
 - port to go/nakama

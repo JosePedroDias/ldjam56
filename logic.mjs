@@ -24,21 +24,21 @@ export function createGame() {
 }
 
 export function moveLeft(m, p) {
-    console.warn('TODO moveLeft');
+    p.pos[0] -= 1;
 }
 
 export function moveRight(m, p) {
-    console.warn('TODO moveRight');
+    p.pos[0] += 1;
 }
 
 export function drop(m, p) {
-    console.warn('TODO drop');
+    p.pos[1] += 1;
 }
 
 export function rotateCW(m, p) {
-    console.warn('TODO rotateCW');
+    p.rotateCW();
 }
 
 export function rotateCCW(m, p) {
-    console.warn('TODO rotateCCW');
+    p.rotateCCW();
 }
