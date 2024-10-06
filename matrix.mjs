@@ -56,23 +56,14 @@ export class Matrix {
         });
     }
 
-    neighbors4([x, y]) {
-        return [
-            [[x-1, y]], // left
-            [[x+1, y]], // right
-            [[x, y-1]], // top
-            [[x, y+1]], // bottom
-        ];//.filter(this.positionExists);
-    }
-
     clone() {
         const m = new Matrix(this.w, this.h);
-        m.fill((pos) => structuredClone(this.getValue(pos)));
+        m.fill((pos) => this.getValue(pos).clone());
         return m;
     }
 
     // similar to clone but keeps the reference to this 
     restore(m) {
-        this.fill((pos) => structuredClone(m.getValue(pos)));
+        this.fill((pos) => m.getValue(pos).clone());
     }
 }

@@ -1,10 +1,11 @@
 import { KEY_LEFT, KEY_RIGHT, KEY_DOWN, KEY_A, KEY_B, KEY_DROP, S } from './constants.mjs';
-import { createGame, moveLeft, moveRight, moveDown, drop, rotateCW, rotateCCW } from './logic.mjs';
+import { createGame, moveLeft, moveRight, moveDown, drop, rotateCW, rotateCCW, applyPill } from './logic.mjs';
 import { setupRender } from './render.mjs';
 
-let m;
-let p;
+let m, p;
 let refresh;
+let speedMs = 1500;
+let lastMoveT = Date.now();
 
 export async function play() {
     [m, p] = createGame();
@@ -40,4 +41,17 @@ export async function play() {
     });
 
     refresh();
+
+
+    const onTick = () => {
+        requestAnimationFrame(onTick);
+        const t = Date.now();
+        if (t - lastMoveT >= speedMs) {
+            if (moveDown(m, p)) applyPill(m, p);
+            refresh();
+            lastMoveT = t;
+        }
+    };
+
+    onTick();
 }

@@ -8,17 +8,20 @@ export function randomColor() {
     return 1 + rndI(3);
 }
 
+function randomPill() {
+    return new Pill(randomColor(), randomColor());
+}
+
 export function createGame() {
     const m = new Matrix(BOARD_W, BOARD_H);
     m.fill(([x, y]) => {
         const isEmpty = y < 6 ? true : rndF01() < 0.95;
         const color = isEmpty ? COLOR_NONE : randomColor();
         const kind = isEmpty ? KIND_EMPTY : KIND_VIRUS;
-        //const kind = isEmpty ? KIND_EMPTY : rndF01() < 0.5 ? KIND_VIRUS : KIND_PILL; // TODO TEMP
-        return new Cell(color, kind, 0);//rndF01() < 0.5 ? 1 : 0);
+        return new Cell(color, kind, 0);
     });
 
-    const p = new Pill(randomColor(), randomColor());
+    const p = randomPill();
 
     return [m, p];
 }
@@ -30,11 +33,10 @@ function getPillCollisions(m, p) {
         const y = (y_ + p.pos[1]);
         if (kind === KIND_PILL) {
             if (!m.positionExists([x, y])) {
-                result.push([x_, y_]); //console.warn('out of bounds', x, y);
+                result.push([x_, y_]); // out of bounds
             } else {
                 const v = m.getValue([x, y]);
-                if (v.kind !== KIND_EMPTY) result.push([x_, y_]); //console.warn('collision', x, y, v);
-                //else console.warn('ok', x, y);
+                if (v.kind !== KIND_EMPTY) result.push([x_, y_]); // collision
             }
         }
     });
@@ -43,6 +45,20 @@ function getPillCollisions(m, p) {
 
 function isPillColliding(m, p) {
     return getPillCollisions(m, p).length > 0;
+}
+
+export function applyPill(m, p) {
+    // copy cells from pill to board
+    p.m.entries().forEach(([[x_, y_], { kind }]) => {
+        const x = (x_ + p.pos[0]);
+        const y = (y_ + p.pos[1]);
+        if (kind === KIND_PILL) {
+            m.setValue([x, y], p.m.getValue([x_, y_]).clone());
+        }
+    });
+
+    // reset new pill
+    p.restore(randomPill());
 }
 
 export function moveLeft(m, p) {

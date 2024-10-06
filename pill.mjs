@@ -71,4 +71,20 @@ export class Pill {
         if (this.m.getValue([1, 2]).kind === KIND_EMPTY) return x === 1 && y === 1;
         return x === 1 && y === 2;
     }
+
+    clone() {
+        const c = new Pill(0, 0);
+        c.rotation = this.rotation;
+        c.pos[1] = this.pos[1];
+        c.pos[0] = this.pos[0];
+        c.m = this.m.clone();
+        return c;
+    }
+
+    restore(c) {
+        this.rotation = c.rotation;
+        this.pos[1] = c.pos[1];
+        this.pos[0] = c.pos[0];
+        this.m.restore(c.m);
+    }
 }
