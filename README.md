@@ -29,7 +29,8 @@ Implemented in vanilla js and rendered using canvas API.
 
 ## TODO
 
-- detect cells to remove
+- properly remove cells
+- drop remaining ones
 - generate decent level
 - hint leaving cells visually
 - display next piece

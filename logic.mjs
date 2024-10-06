@@ -57,6 +57,8 @@ export function applyPill(m, p) {
         }
     });
 
+    markCellsToDelete(m, p);
+
     // reset new pill
     p.restore(randomPill());
 
@@ -119,9 +121,65 @@ export function rotateCCW(m, p) {
 }
 
 export function markCellsToDelete(m, p) {
+    const combos = [];
 
+    for (let x = 0; x < m.w; ++x) {
+        let prev = COLOR_NONE;
+        let combo;
+        for (let y = 0; y < m.h; ++y) {
+            const c = m.getValue([x, y]).color;
+            if (c && !combo || (c && combo && c !== prev)) {
+                combo = [[x, y]];
+                prev = c;
+            } else if (combo && (!c || c !== prev)) {
+                if (combo.length > 3) combos.push(combo);
+                combo = undefined;
+                prev = c;
+            } else if (c === prev && combo) {
+                combo.push([x, y]);
+            }
+        }
+        if (combo && combo.length > 3) combos.push(combo);
+    }
+
+    for (let y = 0; y < m.h; ++y) {
+        let prev = COLOR_NONE;
+        let combo;
+        for (let x = 0; x < m.w; ++x) {
+            const c = m.getValue([x, y]).color;
+            if (c && !combo || (c && combo && c !== prev)) {
+                combo = [[x, y]];
+                prev = c;
+            } else if (combo && (!c || c !== prev)) {
+                if (combo.length > 3) combos.push(combo);
+                combo = undefined;
+                prev = c;
+            } else if (c === prev && combo) {
+                combo.push([x, y]);
+            }
+        }
+        if (combo && combo.length > 3) combos.push(combo);
+    }
+
+    if (combos.length > 0) {
+        console.warn('combos', combos);
+        combos.forEach((c) => {
+            c.forEach((pos) => {
+                const v = m.getValue(pos);
+                v.toRemove();
+            });
+        });
+        // TODO HACkY
+        setTimeout(() => removeMarkedCells(m, p), 2000);
+    }
+
+    return combos.length > 0;
 }
 
 export function removeMarkedCells(m, p) {
-
+    console.log('to remove...');
+    m.values().forEach((v) => {
+        //console.log('v', v);
+        v.clearLeaving();
+    });
 }
