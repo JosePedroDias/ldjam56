@@ -1,4 +1,4 @@
-export const S = 40;
+export const S = 48;
 
 export const BOARD_W =  8;
 export const BOARD_H = 16;

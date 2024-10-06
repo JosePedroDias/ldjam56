@@ -9,7 +9,7 @@ export class Pill {
         this.m.fill(([x, y]) => {
             const kind = (x !== 1 || y === 0) ? KIND_EMPTY : KIND_PILL;
             const color = kind === KIND_EMPTY ? COLOR_NONE : y === 1 ? colorTop : colorBottom;
-            const rotation = (x === 1 && y === 2) ? 2 : 0;
+            const rotation = (x === 1 && y === 2) ? 3 : 1;
             return new Cell(color, kind, rotation);
         });
     }
