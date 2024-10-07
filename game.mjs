@@ -3,17 +3,19 @@ import {
     GP_LEFT, GP_RIGHT, GP_DOWN, GP_DROP, GP_ROT_CW, GP_ROT_CCW,
     S,
 } from './constants.mjs';
-import { createGame, moveLeft, moveRight, moveDown, drop, rotateCW, rotateCCW, applyPill, markCellsToDelete, moveFallingDown } from './logic.mjs';
+import { createGame, moveLeft, moveRight, moveDown, drop, rotateCW, rotateCCW, applyPill, markCellsToDelete, moveFallingDown, countViruses } from './logic.mjs';
 import { setupRender } from './render.mjs';
 import { setupGamepad, rebindGamepad, getGamepadBindings, setGamepadBindings, subscribeToGamepadEvents, subscribeToGamepadBindingMessages } from './gamepad.mjs';
 
 let m, p, refresh;
-let speedMs = 1500;
+let speedMs = 750;
 let lastMoveT = Date.now();
 let isGameOver = false;
 
 export async function play() {
     [m, p] = createGame();
+    const numViruses = countViruses(m);
+    document.title = `viruses: ${numViruses}`;
 
     const [mainEl, _refresh] = setupRender(m, p);
     refresh = _refresh;
@@ -28,7 +30,7 @@ export async function play() {
         if      (key === KEY_LEFT)    moveLeft(m, p);
         else if (key === KEY_RIGHT)   moveRight(m, p);
         else if (key === KEY_DOWN)    moveDown(m, p);
-        else if (key === KEY_DROP)    { drop(m, p); lastMoveT = Date.now() - speedMs; }
+        else if (key === KEY_DROP)    { drop(m, p); lastMoveT = Date.now() - speedMs; } // force end of move tick
         else if (key === KEY_ROT_CW)  rotateCW(m, p);
         else if (key === KEY_ROT_CCW) rotateCCW(m, p);
         else if (key === KEY_ROT_GP_REBIND) {
@@ -38,6 +40,10 @@ export async function play() {
                     localStorage.setItem(GP_LS, JSON.stringify(getGamepadBindings()));
                 } catch (err) {}
             });
+        }
+        else if (key === 'd') { // TODO TEMP
+            window.m = m;
+            debugger;
         }
         else return;
         ev.preventDefault();
@@ -52,15 +58,18 @@ export async function play() {
         requestAnimationFrame(onTick);
         const t = Date.now();
 
-        if (m.markCellsT && m.markCellsT < t) {
+        if (m.markCellsT && m.markCellsT < t) { // effectively remove marked cells
             markCellsToDelete(m);
         }
 
-        if (t - lastMoveT >= speedMs) {
+        if (t - lastMoveT >= speedMs) { // end of move tick
             moveFallingDown(m);
             if (moveDown(m, p)) {
+                //markCellsToDelete(m);
                 isGameOver = applyPill(m, p);
             }
+            const numViruses = countViruses(m);
+            document.title = `viruses: ${numViruses}`;
             lastMoveT = t;
         } 
         

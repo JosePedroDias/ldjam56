@@ -23,6 +23,7 @@ Implemented in vanilla js and rendered using canvas API.
 - Dr Mario
     - https://www.mariowiki.com/Dr._Mario
     - https://www.mariomayhem.com/downloads/mario_instruction_booklets/Dr_Mario-NES.pdf
+    - https://www.youtube.com/watch?v=IHXdtKEHDNU
 - JS APIs
     - https://simon.html5.org/dump/html5-canvas-cheat-sheet.html
     - https://developer.mozilla.org/en-US/docs/Web/API/Gamepad_API , https://developer.mozilla.org/en-US/docs/Web/API/Gamepad_API/Using_the_Gamepad_API
@@ -31,7 +32,8 @@ Implemented in vanilla js and rendered using canvas API.
 
 - display next piece
 - count viruses left
-- generate decent level
+- generate decent levels
+- broken pills should get to be round
 - gamepad: show gamepad messages using a dom element instead of console
 - overlay buttons for mobile?
 - keyboard: redefine keys

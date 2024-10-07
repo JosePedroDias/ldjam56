@@ -8,12 +8,14 @@ export class Cell {
         this.rotation = rotation; // only relevant for pills
         this.leaving = false;
         this.falling = false;
+        this.counterpart = undefined;
     }
 
     clone() {
         const c = new Cell(this.color, this.kind, this.rotation);
-        c.leaving = this.leaving;
-        c.falling = this.falling;
+        c.leaving     = this.leaving;
+        c.falling     = this.falling;
+        c.counterpart = this.counterpart;
         return c;
     }
 
@@ -57,5 +59,6 @@ export class Cell {
         this.rotation = 0;
         this.leaving = false;
         this.falling = false;
+        this.counterpart = undefined;
     }
 }

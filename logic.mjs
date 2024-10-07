@@ -13,8 +13,10 @@ function randomPill() {
 export function createGame() {
     const m = new Matrix(BOARD_W, BOARD_H);
     m.fill(([x, y]) => new Cell(COLOR_NONE, KIND_EMPTY, 0));
-    setupLevel(m, 0);
+    m.nextP = randomPill();
+    setupLevel(m, 5);
     const p = randomPill();
+    console.log(`next: ${m.nextP.toString()}`);
     return [m, p];
 }
 
@@ -52,7 +54,9 @@ export function applyPill(m, p) {
     markCellsToDelete(m, p);
 
     // reset new pill
-    p.restore(randomPill());
+    p.restore(m.nextP);
+    m.nextP = randomPill();
+    console.log(`next: ${m.nextP.toString()}`);
 
     return isPillColliding(m, p);
 }
@@ -138,15 +142,12 @@ export function markCellsToDelete(m) {
 
         const fn = ([x, y]) => {
             const c = m.getValue([x, y]).color;
-            if (c && !combo || (c && combo && c !== prev)) {
-                combo = [[x, y]];
-                prev = c;
-            } else if (combo && (!c || c !== prev)) {
-                fnEnd();
-                combo = undefined;
-                prev = c;
-            } else if (c === prev && combo) {
+            if (c === prev && combo) {
                 combo.push([x, y]);
+            } else {
+                fnEnd();
+                prev = c;
+                combo = c ? [[x, y]] : undefined;
             }
         }
         
@@ -229,4 +230,8 @@ export function moveFallingDown(m) {
         console.log('stopFallingHappened');
         markCellsToDelete(m);
     }
+}
+
+export function countViruses(m) {
+    return m.values().filter((v) => v.isVirus()).length;
 }
