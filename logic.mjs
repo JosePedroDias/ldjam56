@@ -137,23 +137,37 @@ export function markCellsToDelete(m, p) {
     const combos = [];
     let prev, combo;
 
+    const fnEnd = () => { 
+        if (combo && combo.length > 3) {
+            combos.push(combo);
+            let [x, y] = combo[0];
+            while (true) {
+                --y;
+                if (m.positionExists([x, y])) {
+                    const v = m.getValue([x, y]);
+                    if (v.kind !== KIND_EMPTY);
+                    v.toFall();
+                    continue;
+                }
+                break;
+            }
+        }
+    }
+
     const fn = ([x, y]) => {
         const c = m.getValue([x, y]).color;
         if (c && !combo || (c && combo && c !== prev)) {
             combo = [[x, y]];
             prev = c;
         } else if (combo && (!c || c !== prev)) {
-            if (combo.length > 3) combos.push(combo);
+            fnEnd();
             combo = undefined;
             prev = c;
         } else if (c === prev && combo) {
             combo.push([x, y]);
         }
     }
-    const fnEnd = () => { 
-        if (combo && combo.length > 3) combos.push(combo);
-    }
-
+    
     for (let x = 0; x < m.w; ++x) {
         prev = COLOR_NONE;
         combo = undefined;
