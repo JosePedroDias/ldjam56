@@ -10,6 +10,7 @@ import {
 } from './logic.mjs';
 import { setupRender } from './render.mjs';
 import { setupGamepad, rebindGamepad, getGamepadBindings, setGamepadBindings, subscribeToGamepadEvents, subscribeToGamepadBindingMessages } from './gamepad.mjs';
+import { getSearchParam } from './search.mjs';
 
 let m, p, refresh;
 let speedMs = 750;
@@ -24,7 +25,15 @@ function title(m, p) {
 }
 
 export async function play() {
-    [m, p] = createGame(0);
+    let levelNo;
+    try {
+        levelNo = getSearchParam('level');
+        levelNo = parseInt(levelNo, 10);
+        if (!isFinite(levelNo) || levelNo % 1 !== 0 || levelNo < 1 || levelNo > 20) levelNo = 0;
+        else --levelNo;
+    } catch (err) {}
+
+    [m, p] = createGame(levelNo);
     title(m, p);
 
     const [mainEl, _refresh] = setupRender(m, p);
