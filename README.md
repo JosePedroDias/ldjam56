@@ -4,6 +4,8 @@ Inspired by Nintendo's Dr Mario.
 Implemented in vanilla js and rendered using canvas API.  
 No images, libraries or timers used.
 
+[ludum dare game page](https://ldjam.com/events/ludum-dare/56/$402832)
+
 
 ## controls
 
