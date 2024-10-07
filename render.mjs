@@ -156,6 +156,11 @@ function render(el, m, p, { bg, viruses, pills }, r) {
         ctx.fillText(label, xt+2, yt+2);
         ctx.fillStyle = '#7f7';
         ctx.fillText(label, xt, yt);
+
+        if (m.alertText) {
+            ctx.font = '15px sans-serif';
+            ctx.fillText(m.alertText, xt, S * m.h / 2);
+        }
     }
     
 }

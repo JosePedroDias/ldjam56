@@ -13,7 +13,7 @@ No images, libraries or timers used.
 - down - move pill 1 cell down
 - space bar - drop pill
 - z, x - rotate
-- p - toggle pause
+
 
 ### gamepad
 

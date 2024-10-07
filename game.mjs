@@ -45,6 +45,7 @@ export async function play() {
         else if (key === KEY_ROT_GP_REBIND) {
             rebindGamepad().then(() => {
                 console.warn('bindings complete');
+                m.alertText = undefined;
                 try {
                     localStorage.setItem(GP_LS, JSON.stringify(getGamepadBindings()));
                 } catch (err) {}
@@ -58,7 +59,9 @@ export async function play() {
 
     const onTick = () => {
         if (isGameOver) {
-            window.alert('game over');
+            //window.alert('game over');
+            m.alertText = 'game over!';
+            refresh();
             return;
         }
         requestAnimationFrame(onTick);
@@ -105,5 +108,8 @@ export async function play() {
         else if (action === GP_ROT_CCW) rotateCCW(m, p);
         else return;
     });
-    subscribeToGamepadBindingMessages((m) => console.log(m));
+    subscribeToGamepadBindingMessages((msg) => {
+        //console.log(m);
+        m.alertText = msg;
+    });
 }
