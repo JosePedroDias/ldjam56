@@ -26,6 +26,7 @@ export const KEY_DROP    = ' ';
 export const KEY_ROT_CW  = 'z';
 export const KEY_ROT_CCW = 'x';
 export const KEY_ROT_GP_REBIND = '1';
+export const KEY_PAUSE   = 'p';
 // TODO keyboard rebind
 
 export const GP_LEFT    = 'left';

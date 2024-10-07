@@ -13,6 +13,7 @@ No images, libraries or timers used.
 - down - move pill 1 cell down
 - space bar - drop pill
 - z, x - rotate
+- p - toggle pause
 
 
 ### gamepad
@@ -32,11 +33,10 @@ No images, libraries or timers used.
 
 ## TODO
 
-- pause
 - title screen with level choice
 - score and high scores
 - (infrequent but wrong) pills above moving pills should fall too
-- twist from original game?
+- twist from original game? (actually there's an accidental difference: lines match mid-air)
 - falling due to gravity could be faster?
 - (nice to have) overlay buttons for mobile?
 - (nice to have) broken pills should get to be round

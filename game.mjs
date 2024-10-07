@@ -2,6 +2,7 @@ import {
     KEY_LEFT, KEY_RIGHT, KEY_DOWN, KEY_DROP, KEY_ROT_CW, KEY_ROT_CCW, KEY_ROT_GP_REBIND,
     GP_LEFT, GP_RIGHT, GP_DOWN, GP_DROP, GP_ROT_CW, GP_ROT_CCW,
     S,
+    KEY_PAUSE,
 } from './constants.mjs';
 import {
     moveLeft, moveRight, moveDown, drop, rotateCW, rotateCCW,
@@ -42,6 +43,10 @@ export async function play() {
         else if (key === KEY_DROP)    { drop(m, p); lastMoveT = Date.now() - speedMs; } // force end of move tick
         else if (key === KEY_ROT_CW)  rotateCW(m, p);
         else if (key === KEY_ROT_CCW) rotateCCW(m, p);
+        else if (key === KEY_PAUSE) {
+            m.paused = !m.paused;
+            m.alertText = m.paused ? 'paused' : '';
+        }
         else if (key === KEY_ROT_GP_REBIND) {
             rebindGamepad().then(() => {
                 console.warn('bindings complete');
@@ -65,23 +70,29 @@ export async function play() {
             return;
         }
         requestAnimationFrame(onTick);
+
         const t = Date.now();
 
-        if (m.markCellsT && m.markCellsT < t) { // effectively remove marked cells
-            markCellsToDelete(m);
-        }
-
-        if (t - lastMoveT >= speedMs) { // end of move tick
-            moveFallingDown(m);
-            if (moveDown(m, p)) {
-                isGameOver = applyPill(m, p);
+        if (!m.paused) {
+            if (m.markCellsT && m.markCellsT < t) { // effectively remove marked cells
+                markCellsToDelete(m);
             }
-            title(m, p);
-            lastMoveT = t;
-        } 
+
+            if (t - lastMoveT >= speedMs) { // end of move tick
+                moveFallingDown(m);
+                if (moveDown(m, p)) {
+                    isGameOver = applyPill(m, p);
+                }
+                title(m, p);
+                lastMoveT = t;
+            } 
+            
+            const ratio = (t - lastMoveT) / speedMs;
+            refresh(ratio);
+        } else {
+            refresh(0);
+        }
         
-        const ratio = (t - lastMoveT) / speedMs;
-        refresh(ratio);
     };
 
     onTick();
