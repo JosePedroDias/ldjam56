@@ -1,7 +1,8 @@
-# LDJAM56
+# LDJAM56 - Pharma Frenzy
 
 Inspired by Nintendo's Dr Mario.  
 Implemented in vanilla js and rendered using canvas API.  
+No images, libraries or timers used.
 
 
 ## controls
@@ -12,6 +13,7 @@ Implemented in vanilla js and rendered using canvas API.
 - down - move pill 1 cell down
 - space bar - drop pill
 - z, x - rotate
+- p - toggle pause
 
 ### gamepad
 
@@ -30,10 +32,12 @@ Implemented in vanilla js and rendered using canvas API.
 
 ## TODO
 
-- display next piece and viruses count
+- pause
+- title screen with level choice
+- score and high scores
 - (infrequent but wrong) pills above moving pills should fall too
 - twist from original game?
-- falling could be faster?
+- falling due to gravity could be faster?
 - (nice to have) overlay buttons for mobile?
 - (nice to have) broken pills should get to be round
 

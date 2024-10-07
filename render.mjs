@@ -92,6 +92,7 @@ function render(el, m, p, { bg, viruses, pills }, r) {
     ctx.clearRect(0, 0, S * m.w, S * m.h);
     ctx.drawImage(bg, 0, 0);
 
+    // draw board
     m.entries().forEach(([[x, y], { color, kind, rotation, leaving, falling }]) => {
         x *= S;
         y *= S;
@@ -107,6 +108,7 @@ function render(el, m, p, { bg, viruses, pills }, r) {
     });
     ctx.globalAlpha = 1;
 
+    // draw current piece
     ctx.save();
     ctx.translate(0, S * rr);
     p.m.entries().forEach(([[x_, y_], { color, kind, rotation }]) => {
@@ -117,6 +119,17 @@ function render(el, m, p, { bg, viruses, pills }, r) {
         }
     });
     ctx.restore();
+
+    // draw next piece
+    ctx.globalAlpha = 0.66;
+    m.nextP.m.entries().forEach(([[x_, y_], { color, kind, rotation }]) => {
+        const x = S * x_;
+        const y = S * y_;
+        if (kind === KIND_PILL) {
+            drawRotated(ctx, pills[color], [x, y], rotation);
+        }
+    });
+    ctx.globalAlpha = 1;
 
     // print positions
     /*ctx.font = '14px bold sans-serif';
@@ -129,13 +142,14 @@ function render(el, m, p, { bg, viruses, pills }, r) {
         ctx.fillText(`${x},${y}`, xx, yy);
     });*/
 
+    // hacky hud
     ctx.font = '20px sans-serif';
     ctx.fillStyle = '#f7f';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     
     {
-        const label = `level: ${m.level + 1} | viruses left: ${m.virusesLeft}`;
+        const label = `next:         level: ${m.level + 1}     viruses left: ${m.virusesLeft}`;
         const xt = S * m.w / 2;
         const yt = S * 0.5;
         ctx.fillStyle = '#000';
