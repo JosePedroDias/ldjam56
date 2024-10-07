@@ -121,46 +121,47 @@ export function rotateCCW(m, p) {
     rotate(m, p, false);
 }
 
-export function markCellsToDelete(m, p) {
+export function markCellsToDelete(m) {
     delete m.markCellsT;
 
-    removeMarkedCells(m, p);
+    makeFreePillCellsFall(m, removeMarkedCells(m));
 
     const combos = [];
-    let prev, combo;
 
-    const fnEnd = () => { 
-        if (combo && combo.length > 3) {
+    {
+        let prev, combo;
+
+        const fnEnd = () => { 
+            if (!combo || combo.length < 4) return;
             combos.push(combo);
-            //console.log('fnEnd END');
         }
-    }
 
-    const fn = ([x, y]) => {
-        const c = m.getValue([x, y]).color;
-        if (c && !combo || (c && combo && c !== prev)) {
-            combo = [[x, y]];
-            prev = c;
-        } else if (combo && (!c || c !== prev)) {
-            fnEnd();
-            combo = undefined;
-            prev = c;
-        } else if (c === prev && combo) {
-            combo.push([x, y]);
+        const fn = ([x, y]) => {
+            const c = m.getValue([x, y]).color;
+            if (c && !combo || (c && combo && c !== prev)) {
+                combo = [[x, y]];
+                prev = c;
+            } else if (combo && (!c || c !== prev)) {
+                fnEnd();
+                combo = undefined;
+                prev = c;
+            } else if (c === prev && combo) {
+                combo.push([x, y]);
+            }
         }
-    }
-    
-    for (let x = 0; x < m.w; ++x) {
-        prev = COLOR_NONE;
-        combo = undefined;
-        for (let y = 0; y < m.h; ++y) fn([x, y]);
-        fnEnd();
-    }
-    for (let y = 0; y < m.h; ++y) {
-        prev = COLOR_NONE;
-        combo = undefined;
-        for (let x = 0; x < m.w; ++x) fn([x, y]);
-        fnEnd();
+        
+        for (let x = 0; x < m.w; ++x) { // vertical lines
+            prev = COLOR_NONE;
+            combo = undefined;
+            for (let y = 0; y < m.h; ++y) fn([x, y]);
+            fnEnd();
+        }
+        for (let y = 0; y < m.h; ++y) { // horizontal lines
+            prev = COLOR_NONE;
+            combo = undefined;
+            for (let x = 0; x < m.w; ++x) fn([x, y]);
+            fnEnd();
+        }
     }
 
     if (combos.length > 0) {
@@ -174,7 +175,7 @@ export function markCellsToDelete(m, p) {
     return combos.length > 0;
 }
 
-export function removeMarkedCells(m, p) {
+export function removeMarkedCells(m) {
     const left = [];
     m.entries().forEach(([pos, v]) => {
         if (!v.leaving) return;
@@ -182,7 +183,10 @@ export function removeMarkedCells(m, p) {
         v.clearLeaving();
         left.push(pos);
     });
+    return left;
+}
 
+export function makeFreePillCellsFall(m, left) {
     let candidates = new PositionSet();
     left.forEach(([x, y]) => {
         let pp;
@@ -200,12 +204,15 @@ export function removeMarkedCells(m, p) {
             m.getValue(pos).falling = true;
         }
     });
+
+    // TODO pills above moving pills can move too
 }
 
-export function moveFallingDown(m, p) {
+export function moveFallingDown(m) {
     const fallingPositions = m.entries().filter((pair) => pair[1].falling).map(([pos, v]) => pos);
     sortByYDescending(fallingPositions);
     fallingPositions.length > 0 && console.log(`fallingPositions: ${posArrayToString(fallingPositions)}`);
+    let stopFallingHappened = false;
     fallingPositions.forEach((pos) => {
         const posDown = [pos[0], pos[1]+1];
         console.log(`falling ${posToString(pos)} -> ${posToString(posDown)}`)
@@ -214,6 +221,12 @@ export function moveFallingDown(m, p) {
         if (!m.canFallDown(posDown)) {
             console.log(`stop falling: ${posToString(posDown)}`);
             m.getValue(posDown).falling = false;
+            stopFallingHappened = true;
         }
     });
+
+    if (stopFallingHappened) {
+        console.log('stopFallingHappened');
+        markCellsToDelete(m);
+    }
 }

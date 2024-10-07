@@ -63,15 +63,6 @@ export class Matrix {
         this.setValue(p2, v1);
     }
 
-    /*neighborPositions([x, y]) {
-        return [
-            [x-1, y],
-            [x+1, y],
-            [x,   y-1],
-            [x,   y+1],
-        ].filter((p) => this.positionExists(p));
-    }*/
-
     canFallDown([x, y]) {
         const v = this.getValue([x, y]);
         if (!v.isPill()) return false;

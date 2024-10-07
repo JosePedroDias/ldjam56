@@ -53,11 +53,11 @@ export async function play() {
         const t = Date.now();
 
         if (m.markCellsT && m.markCellsT < t) {
-            markCellsToDelete(m, p);
+            markCellsToDelete(m);
         }
 
         if (t - lastMoveT >= speedMs) {
-            moveFallingDown(m, p);
+            moveFallingDown(m);
             if (moveDown(m, p)) {
                 isGameOver = applyPill(m, p);
             }
