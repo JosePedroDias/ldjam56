@@ -31,7 +31,6 @@ Implemented in vanilla js and rendered using canvas API.
 ## TODO
 
 - display next piece and viruses count
-- new level once all viruses are cleared
 - (infrequent but wrong) pills above moving pills should fall too
 - twist from original game?
 - falling could be faster?

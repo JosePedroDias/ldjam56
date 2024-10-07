@@ -13,14 +13,24 @@ function randomPill() {
 const log = () => {};
 //const log = (...args) => console.log(...args);
 
-export function createGame() {
+export function createGame(levelNo) {
     const m = new Matrix(BOARD_W, BOARD_H);
-    m.fill(([x, y]) => new Cell(COLOR_NONE, KIND_EMPTY, 0));
+    m.level = levelNo;
+    m.fill(() => new Cell(COLOR_NONE, KIND_EMPTY, 0));
     m.nextP = randomPill();
-    setupLevel(m, 5);
+    setupLevel(m, levelNo);
     const p = randomPill();
     log(`next: ${m.nextP.toString()}`);
     return [m, p];
+}
+
+export function increaseLevel(m, p) {
+    ++m.level;
+    m.values().forEach((v) => v.clear());
+    m.nextP = randomPill();
+    setupLevel(m, m.level);
+    p.restore(randomPill());
+    log(`next: ${m.nextP.toString()}`);
 }
 
 function getPillCollisions(m, p) {

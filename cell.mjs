@@ -8,7 +8,7 @@ export class Cell {
         this.rotation = rotation; // only relevant for pills
         this.leaving = false;
         this.falling = false;
-        this.counterpart = undefined;
+        this.counterpart = undefined; // only relevant for pills in the future
     }
 
     clone() {

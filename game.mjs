@@ -3,7 +3,10 @@ import {
     GP_LEFT, GP_RIGHT, GP_DOWN, GP_DROP, GP_ROT_CW, GP_ROT_CCW,
     S,
 } from './constants.mjs';
-import { createGame, moveLeft, moveRight, moveDown, drop, rotateCW, rotateCCW, applyPill, markCellsToDelete, moveFallingDown, countViruses } from './logic.mjs';
+import {
+    moveLeft, moveRight, moveDown, drop, rotateCW, rotateCCW,
+    createGame, increaseLevel, applyPill, markCellsToDelete, moveFallingDown, countViruses, 
+} from './logic.mjs';
 import { setupRender } from './render.mjs';
 import { setupGamepad, rebindGamepad, getGamepadBindings, setGamepadBindings, subscribeToGamepadEvents, subscribeToGamepadBindingMessages } from './gamepad.mjs';
 
@@ -12,10 +15,15 @@ let speedMs = 750;
 let lastMoveT = Date.now();
 let isGameOver = false;
 
-export async function play() {
-    [m, p] = createGame();
+function title(m, p) {
     const numViruses = countViruses(m);
-    document.title = `viruses: ${numViruses}`;
+    if (numViruses === 0) increaseLevel(m, p);
+    document.title = `level: ${m.level}, viruses: ${numViruses}`;
+}
+
+export async function play() {
+    [m, p] = createGame(0);
+    title(m, p);
 
     const [mainEl, _refresh] = setupRender(m, p);
     refresh = _refresh;
@@ -41,10 +49,7 @@ export async function play() {
                 } catch (err) {}
             });
         }
-        else if (key === 'd') { // TODO TEMP
-            window.m = m;
-            debugger;
-        }
+        //else if (key === 'd') { window.m = m; debugger } // TODO TEMP
         else return;
         ev.preventDefault();
         ev.stopPropagation();
@@ -65,11 +70,9 @@ export async function play() {
         if (t - lastMoveT >= speedMs) { // end of move tick
             moveFallingDown(m);
             if (moveDown(m, p)) {
-                //markCellsToDelete(m);
                 isGameOver = applyPill(m, p);
             }
-            const numViruses = countViruses(m);
-            document.title = `viruses: ${numViruses}`;
+            title(m, p);
             lastMoveT = t;
         } 
         
@@ -96,7 +99,7 @@ export async function play() {
         if      (action === GP_LEFT)    moveLeft(m, p);
         else if (action === GP_RIGHT)   moveRight(m, p);
         else if (action === GP_DOWN)    moveDown(m, p);
-        else if (action === GP_DROP)    { drop(m, p); lastMoveT = Date.now() - speedMs; }
+        else if (action === GP_DROP)    { drop(m, p); lastMoveT = Date.now() - speedMs; } // force end of move tick
         else if (action === GP_ROT_CW)  rotateCW(m, p);
         else if (action === GP_ROT_CCW) rotateCCW(m, p);
         else return;
