@@ -10,13 +10,16 @@ function randomPill() {
     return new Pill(randomColor(), randomColor());
 }
 
+const log = () => {};
+//const log = (...args) => console.log(...args);
+
 export function createGame() {
     const m = new Matrix(BOARD_W, BOARD_H);
     m.fill(([x, y]) => new Cell(COLOR_NONE, KIND_EMPTY, 0));
     m.nextP = randomPill();
     setupLevel(m, 5);
     const p = randomPill();
-    console.log(`next: ${m.nextP.toString()}`);
+    log(`next: ${m.nextP.toString()}`);
     return [m, p];
 }
 
@@ -56,7 +59,7 @@ export function applyPill(m, p) {
     // reset new pill
     p.restore(m.nextP);
     m.nextP = randomPill();
-    console.log(`next: ${m.nextP.toString()}`);
+    log(`next: ${m.nextP.toString()}`);
 
     return isPillColliding(m, p);
 }
@@ -167,7 +170,7 @@ export function markCellsToDelete(m) {
 
     if (combos.length > 0) {
         combos.forEach((combo) => {
-            console.log(`combo: ${posArrayToString(combo)}`);
+            log(`combo: ${posArrayToString(combo)}`);
             combo.forEach((pos) => m.getValue(pos).toRemove());
         });
         m.markCellsT = Date.now() + LEAVE_MS;
@@ -180,7 +183,7 @@ export function removeMarkedCells(m) {
     const left = [];
     m.entries().forEach(([pos, v]) => {
         if (!v.leaving) return;
-        console.log(`clear leaving: ${posToString(pos)}`);
+        log(`clear leaving: ${posToString(pos)}`);
         v.clearLeaving();
         left.push(pos);
     });
@@ -198,10 +201,10 @@ export function makeFreePillCellsFall(m, left) {
     left.forEach(p => candidates.remove(p));
     candidates = candidates.values();
     sortByYDescending(candidates);
-    //if (candidates.length > 0) { console.log(`candidates: ${posArrayToString(candidates)}`); };
+    //if (candidates.length > 0) { log(`candidates: ${posArrayToString(candidates)}`); };
     candidates.forEach((pos) => {
         if (m.canFallDown(pos)) {
-            console.log(`to fall: ${posToString(pos)}`);
+            log(`to fall: ${posToString(pos)}`);
             m.getValue(pos).falling = true;
         }
     });
@@ -212,24 +215,21 @@ export function makeFreePillCellsFall(m, left) {
 export function moveFallingDown(m) {
     const fallingPositions = m.entries().filter((pair) => pair[1].falling).map(([pos, v]) => pos);
     sortByYDescending(fallingPositions);
-    fallingPositions.length > 0 && console.log(`fallingPositions: ${posArrayToString(fallingPositions)}`);
+    //fallingPositions.length > 0 && log(`fallingPositions: ${posArrayToString(fallingPositions)}`);
     let stopFallingHappened = false;
     fallingPositions.forEach((pos) => {
         const posDown = [pos[0], pos[1]+1];
-        console.log(`falling ${posToString(pos)} -> ${posToString(posDown)}`)
+        log(`falling ${posToString(pos)} -> ${posToString(posDown)}`)
         m.swap(pos, posDown);
 
         if (!m.canFallDown(posDown)) {
-            console.log(`stop falling: ${posToString(posDown)}`);
+            log(`stop falling: ${posToString(posDown)}`);
             m.getValue(posDown).falling = false;
             stopFallingHappened = true;
         }
     });
 
-    if (stopFallingHappened) {
-        console.log('stopFallingHappened');
-        markCellsToDelete(m);
-    }
+    if (stopFallingHappened) markCellsToDelete(m);
 }
 
 export function countViruses(m) {

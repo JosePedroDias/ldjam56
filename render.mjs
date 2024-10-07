@@ -119,7 +119,7 @@ function render(el, m, p, { bg, viruses, pills }, r) {
     ctx.restore();
 
     // print positions
-    ctx.font = '14px sans-serif';
+    /*ctx.font = '14px sans-serif';
     ctx.fillStyle = '#f7f';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
@@ -127,7 +127,7 @@ function render(el, m, p, { bg, viruses, pills }, r) {
         const xx = S * (x + 0.5);
         const yy = S * (y + 0.5);
         ctx.fillText(`${x},${y}`, xx, yy);
-    });
+    });*/
 }
 
 export function setupRender(m, p) {

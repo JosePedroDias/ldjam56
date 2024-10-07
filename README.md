@@ -30,13 +30,15 @@ Implemented in vanilla js and rendered using canvas API.
 
 ## TODO
 
-- display next piece
-- count viruses left
-- generate decent levels
-- broken pills should get to be round
-- gamepad: show gamepad messages using a dom element instead of console
-- overlay buttons for mobile?
-- keyboard: redefine keys
+- display next piece and viruses count
+- new level once all viruses are cleared
+- (infrequent but wrong) pills above moving pills should fall too
 - twist from original game?
+- falling could be faster?
+- (nice to have) overlay buttons for mobile?
+- (nice to have) broken pills should get to be round
+
+- gamepad: show gamepad messages using a dom element instead of console
+- keyboard: redefine keys
 - actual sprites instead of geometric figures?
 - port to go/nakama or use peerjs to do multiplayer
