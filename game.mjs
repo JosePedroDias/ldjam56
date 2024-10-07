@@ -18,6 +18,7 @@ let isGameOver = false;
 function title(m, p) {
     const numViruses = countViruses(m);
     if (numViruses === 0) increaseLevel(m, p);
+    m.virusesLeft = numViruses;
     document.title = `level: ${m.level}, viruses: ${numViruses}`;
 }
 
