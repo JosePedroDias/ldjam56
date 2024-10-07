@@ -3,7 +3,7 @@ import {
     GP_LEFT, GP_RIGHT, GP_DOWN, GP_DROP, GP_ROT_CW, GP_ROT_CCW,
     S,
 } from './constants.mjs';
-import { createGame, moveLeft, moveRight, moveDown, drop, rotateCW, rotateCCW, applyPill, markCellsToDelete } from './logic.mjs';
+import { createGame, moveLeft, moveRight, moveDown, drop, rotateCW, rotateCCW, applyPill, markCellsToDelete, moveFallingDown } from './logic.mjs';
 import { setupRender } from './render.mjs';
 import { setupGamepad, rebindGamepad, getGamepadBindings, setGamepadBindings, subscribeToGamepadEvents, subscribeToGamepadBindingMessages } from './gamepad.mjs';
 
@@ -57,6 +57,7 @@ export async function play() {
         }
 
         if (t - lastMoveT >= speedMs) {
+            moveFallingDown(m, p);
             if (moveDown(m, p)) {
                 isGameOver = applyPill(m, p);
             }

@@ -5,3 +5,7 @@ export function rndI(n) {
 export function rndF01() {
     return Math.random();
 }
+
+export function randomColor() {
+    return 1 + rndI(3);
+}

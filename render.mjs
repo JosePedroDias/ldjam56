@@ -91,16 +91,22 @@ function render(el, m, p, { bg, viruses, pills }, r) {
     const ctx = el.getContext('2d');
     ctx.clearRect(0, 0, S * m.w, S * m.h);
     ctx.drawImage(bg, 0, 0);
-    m.entries().forEach(([[x, y], { color, kind, rotation, leaving }]) => {
+
+    m.entries().forEach(([[x, y], { color, kind, rotation, leaving, falling }]) => {
         x *= S;
         y *= S;
         ctx.globalAlpha = leaving ? 0.5 : 1;
+        ctx.save();
+        ctx.translate(0, falling ? S * rr : 0);
         if (kind === KIND_VIRUS) {
             ctx.drawImage(viruses[color], x, y);
         } else if (kind === KIND_PILL) {
             drawRotated(ctx, pills[color], [x, y], rotation);
         }
+        ctx.restore();
     });
+    ctx.globalAlpha = 1;
+
     ctx.save();
     ctx.translate(0, S * rr);
     p.m.entries().forEach(([[x_, y_], { color, kind, rotation }]) => {
@@ -111,6 +117,17 @@ function render(el, m, p, { bg, viruses, pills }, r) {
         }
     });
     ctx.restore();
+
+    // print positions
+    ctx.font = '14px sans-serif';
+    ctx.fillStyle = '#f7f';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    m.positions().forEach(([x, y]) => {
+        const xx = S * (x + 0.5);
+        const yy = S * (y + 0.5);
+        ctx.fillText(`${x},${y}`, xx, yy);
+    });
 }
 
 export function setupRender(m, p) {

@@ -56,6 +56,31 @@ export class Matrix {
         });
     }
 
+    swap(p1, p2) {
+        const v1 = this.getValue(p1);
+        const v2 = this.getValue(p2);
+        this.setValue(p1, v2);
+        this.setValue(p2, v1);
+    }
+
+    /*neighborPositions([x, y]) {
+        return [
+            [x-1, y],
+            [x+1, y],
+            [x,   y-1],
+            [x,   y+1],
+        ].filter((p) => this.positionExists(p));
+    }*/
+
+    canFallDown([x, y]) {
+        const v = this.getValue([x, y]);
+        if (!v.isPill()) return false;
+        const posDown = [x, y + 1];
+        if (!this.positionExists(posDown)) return false;
+        const vDown = this.getValue(posDown);
+        return vDown.isEmptyOrFalling();
+    }
+
     clone() {
         const m = new Matrix(this.w, this.h);
         m.fill((pos) => this.getValue(pos).clone());

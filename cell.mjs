@@ -1,4 +1,5 @@
-import { COLOR_NONE, KIND_EMPTY } from './constants.mjs';
+import { COLOR_NONE, KIND_EMPTY, KIND_PILL, KIND_VIRUS } from './constants.mjs';
+import { rndI } from './random.mjs';
 
 export class Cell {
     constructor(color, kind, rotation) {
@@ -12,21 +13,49 @@ export class Cell {
     clone() {
         const c = new Cell(this.color, this.kind, this.rotation);
         c.leaving = this.leaving;
+        c.falling = this.falling;
         return c;
+    }
+
+    isEmpty() {
+        return this.kind === KIND_EMPTY;
+    }
+
+    isEmptyOrFalling() {
+        return this.kind === KIND_EMPTY || this.falling;
+    }
+
+    isFilled() {
+        return this.kind !== KIND_EMPTY;
+    }
+
+    isVirus() {
+        return this.kind === KIND_VIRUS;
+    }
+
+    isPill() {
+        return this.kind === KIND_PILL;
+    }
+
+    toVirus(color) {
+        this.kind = KIND_VIRUS;
+        this.color = color || (1 + rndI(3));
     }
 
     toRemove() {
         this.leaving = true;
     }
 
-    toFall() {
-        this.falling = true;
-    }
-
     clearLeaving() {
         if (!this.leaving) return;
-        this.leaving = false;
+        this.clear();
+    }
+
+    clear() {
         this.color = COLOR_NONE;
         this.kind = KIND_EMPTY;
+        this.rotation = 0;
+        this.leaving = false;
+        this.falling = false;
     }
 }

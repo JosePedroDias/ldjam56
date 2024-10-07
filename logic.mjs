@@ -1,12 +1,10 @@
-import { BOARD_H, BOARD_W, COLOR_NONE, KIND_VIRUS, KIND_EMPTY, KIND_PILL, LEAVE_MS } from './constants.mjs';
-import { rndF01, rndI } from './random.mjs';
+import { BOARD_H, BOARD_W, COLOR_NONE, KIND_EMPTY, KIND_PILL, LEAVE_MS } from './constants.mjs';
+import { setupLevel } from './levels.mjs';
 import { Matrix } from './matrix.mjs';
-import { Cell } from './cell.mjs';
 import { Pill } from './pill.mjs';
-
-export function randomColor() {
-    return 1 + rndI(3);
-}
+import { Cell } from './cell.mjs';
+import { randomColor } from './random.mjs';
+import { PositionSet, posToString, posArrayToString, sortByYDescending } from './position.mjs';
 
 function randomPill() {
     return new Pill(randomColor(), randomColor());
@@ -14,15 +12,9 @@ function randomPill() {
 
 export function createGame() {
     const m = new Matrix(BOARD_W, BOARD_H);
-    m.fill(([x, y]) => {
-        const isEmpty = y < 6 ? true : rndF01() < 0.95;
-        const color = isEmpty ? COLOR_NONE : randomColor();
-        const kind = isEmpty ? KIND_EMPTY : KIND_VIRUS;
-        return new Cell(color, kind, 0);
-    });
-
+    m.fill(([x, y]) => new Cell(COLOR_NONE, KIND_EMPTY, 0));
+    setupLevel(m, 0);
     const p = randomPill();
-
     return [m, p];
 }
 
@@ -140,17 +132,7 @@ export function markCellsToDelete(m, p) {
     const fnEnd = () => { 
         if (combo && combo.length > 3) {
             combos.push(combo);
-            let [x, y] = combo[0];
-            while (true) {
-                --y;
-                if (m.positionExists([x, y])) {
-                    const v = m.getValue([x, y]);
-                    if (v.kind !== KIND_EMPTY);
-                    v.toFall();
-                    continue;
-                }
-                break;
-            }
+            //console.log('fnEnd END');
         }
     }
 
@@ -194,13 +176,46 @@ export function markCellsToDelete(m, p) {
     return combos.length > 0;
 }
 
-function markFallingCells(m, p) {
+export function removeMarkedCells(m, p) {
+    const left = [];
+    m.entries().forEach(([pos, v]) => {
+        if (!v.leaving) return;
+        console.log(`clear leaving: ${posToString(pos)}`);
+        v.clearLeaving();
+        left.push(pos);
+    });
 
+    let candidates = new PositionSet();
+    left.forEach(([x, y]) => {
+        let pp;
+        pp = [x-1, y  ]; if (m.positionExists(pp)) candidates.add(pp);
+        pp = [x,   y-1]; if (m.positionExists(pp)) candidates.add(pp);
+        pp = [x+1, y  ]; if (m.positionExists(pp)) candidates.add(pp);
+    });
+    left.forEach(p => candidates.remove(p));
+    candidates = candidates.values();
+    sortByYDescending(candidates);
+    //if (candidates.length > 0) { console.log(`candidates: ${posArrayToString(candidates)}`); };
+    candidates.forEach((pos) => {
+        if (m.canFallDown(pos)) {
+            console.log(`to fall: ${posToString(pos)}`);
+            m.getValue(pos).falling = true;
+        }
+    });
 }
 
-export function removeMarkedCells(m, p) {
-    m.values().forEach((v) => {
-        //console.log('v', v);
-        v.clearLeaving();
+export function moveFallingDown(m, p) {
+    const fallingPositions = m.entries().filter((pair) => pair[1].falling).map(([pos, v]) => pos);
+    sortByYDescending(fallingPositions);
+    //console.log(`fallingPositions: ${posArrayToString(fallingPositions)}`);
+    //if (fallingPositions.leaving > 0) debugger;
+    fallingPositions.forEach((pos) => {
+        if (!m.canFallDown(pos)) {
+            m.getValue(pos).falling = false;
+            return;
+        }
+        const posDown = [pos[0], pos[1]+1];
+        //console.log(`SWAP ${posToString(pos)} <> ${posToString(posDown)}`)
+        m.swap(pos, posDown);
     });
 }
