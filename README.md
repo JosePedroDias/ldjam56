@@ -29,13 +29,11 @@ Implemented in vanilla js and rendered using canvas API.
 
 ## TODO
 
-- drop remaining ones WIP
-- generate decent level
 - display next piece
 - count viruses left
+- generate decent level
 - gamepad: show gamepad messages using a dom element instead of console
 - overlay buttons for mobile?
-- ascii homebrew font?
 - keyboard: redefine keys
 - twist from original game?
 - actual sprites instead of geometric figures?

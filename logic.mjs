@@ -164,11 +164,9 @@ export function markCellsToDelete(m, p) {
     }
 
     if (combos.length > 0) {
-        combos.forEach((c) => {
-            c.forEach((pos) => {
-                const v = m.getValue(pos);
-                v.toRemove();
-            });
+        combos.forEach((combo) => {
+            console.log(`combo: ${posArrayToString(combo)}`);
+            combo.forEach((pos) => m.getValue(pos).toRemove());
         });
         m.markCellsT = Date.now() + LEAVE_MS;
     }
@@ -207,15 +205,15 @@ export function removeMarkedCells(m, p) {
 export function moveFallingDown(m, p) {
     const fallingPositions = m.entries().filter((pair) => pair[1].falling).map(([pos, v]) => pos);
     sortByYDescending(fallingPositions);
-    //console.log(`fallingPositions: ${posArrayToString(fallingPositions)}`);
-    //if (fallingPositions.leaving > 0) debugger;
+    fallingPositions.length > 0 && console.log(`fallingPositions: ${posArrayToString(fallingPositions)}`);
     fallingPositions.forEach((pos) => {
-        if (!m.canFallDown(pos)) {
-            m.getValue(pos).falling = false;
-            return;
-        }
         const posDown = [pos[0], pos[1]+1];
-        //console.log(`SWAP ${posToString(pos)} <> ${posToString(posDown)}`)
+        console.log(`falling ${posToString(pos)} -> ${posToString(posDown)}`)
         m.swap(pos, posDown);
+
+        if (!m.canFallDown(posDown)) {
+            console.log(`stop falling: ${posToString(posDown)}`);
+            m.getValue(posDown).falling = false;
+        }
     });
 }
