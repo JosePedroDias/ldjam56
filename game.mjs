@@ -42,10 +42,7 @@ export async function play() {
         else return;
         ev.preventDefault();
         ev.stopPropagation();
-        refresh();
     });
-
-    refresh();
 
     const onTick = () => {
         if (isGameOver) {
@@ -63,12 +60,11 @@ export async function play() {
             if (moveDown(m, p)) {
                 isGameOver = applyPill(m, p);
             }
-            refresh();
             lastMoveT = t;
-        } else {
-            const ratio = (t - lastMoveT) / speedMs;
-            refresh(ratio);
-        }
+        } 
+        
+        const ratio = (t - lastMoveT) / speedMs;
+        refresh(ratio);
     };
 
     onTick();
@@ -94,7 +90,6 @@ export async function play() {
         else if (action === GP_ROT_CW)  rotateCW(m, p);
         else if (action === GP_ROT_CCW) rotateCCW(m, p);
         else return;
-        refresh();
     });
     subscribeToGamepadBindingMessages((m) => console.log(m));
 }

@@ -9,8 +9,6 @@ const rad180 = Math.PI;
 const rad90  = rad180 / 2;
 const rad360 = rad180 * 2;
 
-let r;
-
 function createCanvas([w, h], toAppend) {
     const el = document.createElement('canvas');
     el.setAttribute('width', S * w);
@@ -84,7 +82,7 @@ function drawRotated(ctx, sprite, [x, y], ninetyDegTimes) {
     ctx.restore();
 }
 
-function render(el, m, p, { bg, viruses, pills }) {
+function render(el, m, p, { bg, viruses, pills }, r) {
     let rr = 0;
     if (r > 0.5 && m.canMoveDown) {
         rr = 2 * (r - 0.5);
@@ -135,11 +133,8 @@ export function setupRender(m, p) {
     const mainEl = createCanvas([m.w, m.h], true);
     
     // setup refresh function
-    const refresh = (r_) => {
-        if (r_ !== undefined) {
-            r = r_;
-        }
-        render(mainEl, m, p, sprites);
+    const refresh = (r) => {
+        render(mainEl, m, p, sprites, r);
     }
 
     return [mainEl, refresh];

@@ -187,6 +187,10 @@ export function markCellsToDelete(m, p) {
     return combos.length > 0;
 }
 
+function markFallingCells(m, p) {
+
+}
+
 export function removeMarkedCells(m, p) {
     m.values().forEach((v) => {
         //console.log('v', v);

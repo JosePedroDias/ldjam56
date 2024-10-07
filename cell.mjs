@@ -6,6 +6,7 @@ export class Cell {
         this.kind = kind;
         this.rotation = rotation; // only relevant for pills
         this.leaving = false;
+        this.falling = false;
     }
 
     clone() {
@@ -16,6 +17,10 @@ export class Cell {
 
     toRemove() {
         this.leaving = true;
+    }
+
+    toFall() {
+        this.falling = true;
     }
 
     clearLeaving() {
