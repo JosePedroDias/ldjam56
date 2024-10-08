@@ -2,7 +2,7 @@ import {
     BOARD_W ,BOARD_H,
     COLOR_NONE,
     KIND_EMPTY, KIND_PILL,
-    LEAVE_MS,
+    LEAVE_MS, FALL_MS,
 } from './constants.mjs';
 import { Matrix } from './matrix.mjs';
 import { Cell } from './cell.mjs';
@@ -28,7 +28,7 @@ export class GameState {
         this.score = 0;
         this.paused = false;
         this.isGameOver = false;
-        this.speedMs = 750;
+        this.speedMs = FALL_MS;
         this.lastMoveT = Date.now();
         this.alertText = '';
         //this.markCellsT;

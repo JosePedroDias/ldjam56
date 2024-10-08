@@ -1,3 +1,6 @@
+export const FALL_MS = 750;
+export const LEAVE_MS = FALL_MS / 2;
+
 export const S = 48;
 
 export const BOARD_W =  8;
@@ -37,5 +40,3 @@ export const GP_ROT_CW  = 'rcw';
 export const GP_ROT_CCW = 'rccw';
 
 export const GP_ACTIONS = [ GP_LEFT, GP_RIGHT, GP_DOWN, GP_DROP, GP_ROT_CW, GP_ROT_CCW ];
-
-export const LEAVE_MS = 500;
