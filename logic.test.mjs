@@ -25,6 +25,10 @@ function removeCanvases() {
     });
 }
 
+function countChars(str, ch) {
+    return str.split('').reduce((prev, curr) => curr === ch ? prev + 1 : prev, 0);
+}
+
 function tRandom() {
     deterministicWithSeed(42);
     assert(rndI(100) === 60, 'deterministic PRNG works');
@@ -78,9 +82,13 @@ function tLines() {
     st.currentPill.pos = [1, 13];
     st.applyPill();
 
-    log(st.board.toString(TO_STRING_LEAVING));
+    const leavingShot = st.board.toString(TO_STRING_LEAVING);
+    assert( countChars(leavingShot, 'L') === 4, '4 cells should have been marked for leaving');
+    //log(leavingShot);
     st.markCellsToDelete();
-    log(st.board.toString(TO_STRING_FALLING)); // WRONG! ONE CELL LEFT TO FALL!
+    const fallingShot = st.board.toString(TO_STRING_FALLING);
+    assert( countChars(fallingShot, 'F') === 3, '3 cells should have been marked for falling'); // TODO: FAILS
+    //log(fallingShot); // WRONG! ONE CELL LEFT TO FALL!
 
     refresh(0);
 }
