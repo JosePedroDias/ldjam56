@@ -37,12 +37,11 @@ No images, libraries or timers used.
 
 - title screen with level choice
 - score and high scores
-- (infrequent but wrong) pills above moving pills should fall too
-- twist from original game? (actually there's an accidental difference: lines match mid-air)
-- falling due to gravity could be faster?
-- (nice to have) broken pills should get to be round
-
-- gamepad: show gamepad messages using a dom element instead of console
-- keyboard: redefine keys
+- falling due to gravity could be faster? (and done in isolation, prior the gameplay resuming)
+- increase game speed over levels
+- (nice to have) as pills get split, the remaining halves become round
+- keyboard: redefine keys, accept caps?
+- basic animations (fade, scale)
 - actual sprites instead of geometric figures?
-- port to go/nakama or use peerjs to do multiplayer
+- twist from original game (??)
+- port to go/nakama or use peerjs to do multiplayer (when doing head to head)

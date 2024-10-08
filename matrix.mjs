@@ -72,6 +72,12 @@ export class Matrix {
         return vDown.isEmptyOrFalling();
     }
 
+    pillExists(pos) {
+        if (!this.positionExists(pos)) return false;
+        const v = this.getValue(pos);
+        return v.isPill();
+    }
+
     clone() {
         const m = new Matrix(this.w, this.h);
         m.fill((pos) => this.getValue(pos).clone());

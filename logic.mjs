@@ -232,6 +232,16 @@ export class GameState {
             pp = [x+1, y  ]; if (this.board.positionExists(pp)) candidates.add(pp);
         });
         left.forEach(p => candidates.remove(p));
+
+        // add cells above candidates while they're pills
+        candidates.values().forEach((pos) => {
+            while (true) {
+                pos = [pos[0], pos[1]-1];
+                if (!this.board.pillExists(pos)) break;
+                candidates.add(pos);
+            }
+        });
+
         candidates = candidates.values();
         sortByYDescending(candidates);
         //if (candidates.length > 0) { log(`candidates: ${posArrayToString(candidates)}`); };
@@ -241,8 +251,6 @@ export class GameState {
                 this.board.getValue(pos).falling = true;
             }
         });
-
-        // TODO pills above moving pills can move too
     }
 
     moveFallingDown() {
