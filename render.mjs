@@ -82,14 +82,21 @@ function drawRotated(ctx, sprite, [x, y], ninetyDegTimes) {
     ctx.restore();
 }
 
+const MINR = 0.2;
+const DR = 1 - MINR;
+function lin(st, r) {
+    let rr = 0;
+    if (r > MINR && st.canMoveDown) {
+        rr = 1/DR * (r - MINR);
+    }
+    return rr;
+}
+
 function render(el, st, { bg, viruses, pills }, r) {
     const m = st.board;
     const p = st.currentPill;
 
-    let rr = 0;
-    if (r > 0.5 && st.canMoveDown) {
-        rr = 2 * (r - 0.5);
-    }
+    let rr = lin(st, r);
 
     const ctx = el.getContext('2d');
     ctx.clearRect(0, 0, S * m.w, S * m.h);
@@ -152,7 +159,7 @@ function render(el, st, { bg, viruses, pills }, r) {
     ctx.textBaseline = 'middle';
     
     {
-        const label = `next:         level: ${st.level + 1}     viruses left: ${st.virusCount}`;
+        const label = `next:         level: ${st.level}     viruses left: ${st.virusCount}`;
         const xt = S * m.w / 2;
         const yt = S * 0.5;
         ctx.fillStyle = '#000';

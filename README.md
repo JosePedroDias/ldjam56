@@ -37,8 +37,7 @@ No images, libraries or timers used.
 
 - title screen with level choice
 - score and high scores
-- falling due to gravity could be faster? (and done in isolation, prior the gameplay resuming)
-- increase game speed over levels
+- piece going down and gravity being mutually exclusive modes
 - (nice to have) as pills get split, the remaining halves become round
 - keyboard: redefine keys, accept caps?
 - fix lack of animation on first row

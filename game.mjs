@@ -27,8 +27,7 @@ export async function play() {
     try {
         let levelNo = getSearchParam('level');
         levelNo = parseInt(levelNo, 10);
-        if (!isFinite(levelNo) || levelNo % 1 !== 0 || levelNo < 1 || levelNo > 20) levelNo = 0;
-        else --levelNo;
+        if (!isFinite(levelNo) || levelNo % 1 !== 0 || levelNo < 0 || levelNo > 20) levelNo = 0;
         st = new GameState(levelNo);
     } catch (err) {
         st = new GameState();

@@ -28,10 +28,17 @@ export class GameState {
         this.score = 0;
         this.paused = false;
         this.isGameOver = false;
-        this.speedMs = FALL_MS;
-        this.lastMoveT = Date.now();
         this.alertText = '';
         //this.markCellsT;
+        this.setSpeed();
+    }
+
+    setSpeed() {
+        // deltaMult maxLevel
+        const speedMult = 1 + this.level * 0.75/21;
+        this.speedMs = FALL_MS / speedMult;
+        //console.warn(`level ${this.level} -> speed mult: ${speedMult}. ms: ${this.speedMs}`);
+        this.lastMoveT = Date.now() - FALL_MS + 1;
     }
 
     increaseLevel() {
@@ -39,6 +46,7 @@ export class GameState {
         this.clearBoard();
         setupLevel(this.board, this.level);
         this.updateVirusCount();
+        this.setSpeed();
     }
 
     clearBoard() {
