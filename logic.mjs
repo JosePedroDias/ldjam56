@@ -22,11 +22,9 @@ export class GameState {
     constructor(levelNo = 0) {
         this.level = levelNo;
         this.board = new Matrix(BOARD_W, BOARD_H);
-        this.board.fill(() => new Cell(COLOR_NONE, KIND_EMPTY, 0));
+        this.clearBoard();
         setupLevel(this.board, levelNo);
         this.updateVirusCount();
-        this.currentPill = randomPill();
-        this.nextPill = randomPill();
         this.score = 0;
         this.paused = false;
         this.isGameOver = false;
@@ -38,10 +36,14 @@ export class GameState {
 
     increaseLevel() {
         ++this.level;
-        this.board.values().forEach((v) => v.clear());
-        this.nextPill = randomPill();
+        this.clearBoard();
         setupLevel(this.board, this.level);
         this.updateVirusCount();
+    }
+
+    clearBoard() {
+        this.board.fill(() => new Cell(COLOR_NONE, KIND_EMPTY, 0));
+        this.nextPill = randomPill();
         this.currentPill = randomPill();
     }
 
@@ -200,7 +202,9 @@ export class GameState {
         if (combos.length > 0) {
             combos.forEach((combo) => {
                 log(`combo: ${posArrayToString(combo)}`);
-                combo.forEach((pos) => this.board.getValue(pos).toRemove());
+                combo.forEach((pos) => {
+                    this.board.getValue(pos).leaving = true;
+                });
             });
             this.markCellsT = Date.now() + LEAVE_MS;
         }
@@ -213,7 +217,7 @@ export class GameState {
         this.board.entries().forEach(([pos, v]) => {
             if (!v.leaving) return;
             log(`clear leaving: ${posToString(pos)}`);
-            v.clearLeaving();
+            v.toEmpty();
             left.push(pos);
         });
         return left;

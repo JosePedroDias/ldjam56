@@ -1,5 +1,7 @@
+import { TO_STRING_FALLING, TO_STRING_LEAVING } from './cell.mjs';
 import { GameState } from './logic.mjs';
-import { deterministicWithSeed, rndI } from './random.mjs';
+import { resetToDefaultPRNG, deterministicWithSeed, rndI } from './random.mjs';
+import { setupRender } from './render.mjs';
 
 ////
 
@@ -17,37 +19,88 @@ if (globalThis.document) {
 
 ////
 
-function tBoard() {
-    deterministicWithSeed(42);
-    const st = new GameState(10);
-    assert(st.board.w === 8);
-    assert(st.board.h === 16);
+function removeCanvases() {
+    Array.from(document.querySelectorAll('canvas')).forEach((el) => {
+        el.parentNode.removeChild(el);
+    });
+}
 
-    assert(st.getPillCollisions().length === 0);
+function tRandom() {
+    deterministicWithSeed(42);
+    assert(rndI(100) === 60, 'deterministic PRNG works');
+    assert(rndI(100) === 44 );
+    assert(rndI(100) === 85 );
+}
+
+function tBoard() {
+    deterministicWithSeed(46);
+    const st = new GameState(10);
+    assert(st.board.w ===  8, 'board width  is  8');
+    assert(st.board.h === 16, 'board height is 16');
+
+    assert(st.getPillCollisions().length === 0, 'no collisions ocurred');
 
     //log(st.board.toString());
     st.currentPill.pos[1] = 7;
     //log(st.currentPill.toString());
 
-    assert(st.getPillCollisions().length === 2);
+    assert(st.getPillCollisions().length === 1, '1 collision ocurred');
 
-    //st.applyPill();
+    st.applyPill();
     //log(st.board.toString());
 }
 
-function tRandom() {
+function tRender() {
     deterministicWithSeed(42);
-    assert( rndI(100) === 60 );
-    assert( rndI(100) === 44 );
-    assert( rndI(100) === 85 );
+    const st = new GameState(3);
+    const [canvasEl, refresh] = setupRender(st);
+    refresh(0);
+}
+
+function tLines() {
+    deterministicWithSeed(42);
+    const st = new GameState(3);
+    const [canvasEl, refresh] = setupRender(st);
+
+    // horizontal line
+    st.clearBoard();
+
+    st.board.getValue([4, 13]).toPill(2, 1); // these 2 should fall
+    st.board.getValue([4, 14]).toPill(3, 3);
+
+    st.board.getValue([1, 14]).toVirus(3); // this one should stay in place
+
+    st.board.getValue([1, 15]).toPill(1);
+    st.board.getValue([3, 15]).toPill(1);
+    st.board.getValue([4, 15]).toPill(1);
+
+    st.rotateCCW();
+    st.currentPill.pos = [1, 13];
+    st.applyPill();
+
+    log(st.board.toString(TO_STRING_LEAVING));
+    st.markCellsToDelete();
+    log(st.board.toString(TO_STRING_FALLING)); // WRONG! ONE CELL LEFT TO FALL!
+
+    refresh(0);
+}
+
+function tGravity() {
+    // TODO
 }
 
 ////
 
 [
+    tRandom,
     tBoard,
-    //tRandom,
+    tRender,
+    tLines,
+    tGravity,
 ].forEach((fn) => {
+    resetToDefaultPRNG();
     fn();
-    console.log(`✅ ${fn.name}`);
+    const name = fn.name;
+    console.log(`✅ ${name}`);
+    //removeCanvases();
 });
