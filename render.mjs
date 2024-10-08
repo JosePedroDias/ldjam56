@@ -190,9 +190,7 @@ export function setupRender(st) {
     const mainEl = createCanvas([m.w, m.h], true);
     
     // setup refresh function
-    const refresh = (r) => {
-        render(mainEl, st, sprites, r);
-    }
+    const refresh = (ratio) => render(mainEl, st, sprites, ratio);
 
     return [mainEl, refresh];
 }

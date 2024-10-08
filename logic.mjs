@@ -2,16 +2,17 @@ import {
     BOARD_W ,BOARD_H,
     COLOR_NONE,
     KIND_EMPTY, KIND_PILL,
+    LEAVE_MS,
 } from './constants.mjs';
 import { Matrix } from './matrix.mjs';
 import { Cell } from './cell.mjs';
 import { Pill } from './pill.mjs';
 import { randomColor } from './random.mjs';
 import { setupLevel } from './levels.mjs';
-import { sortByYDescending } from './position.mjs';
+import { PositionSet, sortByYDescending, posToString, posArrayToString } from './position.mjs';
 
-//const log = () => {};
-const log = (...args) => console.log(...args);
+const log = () => {};
+//const log = (...args) => console.log(...args);
 
 function randomPill() {
     return new Pill(randomColor(), randomColor());
@@ -30,9 +31,9 @@ export class GameState {
         this.paused = false;
         this.isGameOver = false;
         this.speedMs = 750;
-        //this.lastMoveT = Date.now();
-        //this.markCellsT = 0;
+        this.lastMoveT = Date.now();
         this.alertText = '';
+        //this.markCellsT;
     }
 
     increaseLevel() {
@@ -40,11 +41,13 @@ export class GameState {
         this.board.values().forEach((v) => v.clear());
         this.nextPill = randomPill();
         setupLevel(this.board, this.level);
-        this.currentPill = randomColor();
+        this.updateVirusCount();
+        this.currentPill = randomPill();
     }
 
     updateVirusCount() {
         this.virusCount = this.board.values().filter((v) => v.isVirus()).length;
+        if (this.virusCount === 0) this.increaseLevel();
     }
 
     togglePause() {
@@ -54,7 +57,7 @@ export class GameState {
 
     getPillCollisions() {
         const result = [];
-        this.board.entries().forEach(([[x_, y_], { kind }]) => {
+        this.currentPill.m.entries().forEach(([[x_, y_], { kind }]) => {
             const x = (x_ + this.currentPill.pos[0]);
             const y = (y_ + this.currentPill.pos[1]);
             if (kind === KIND_PILL) {
@@ -141,9 +144,9 @@ export class GameState {
         const leftC   = colls.some((pos) => this.currentPill.isLeftmost(pos));
         const rightC  = colls.some((pos) => this.currentPill.isRightmost(pos));
         const bottomC = colls.some((pos) => this.currentPill.isBottommost(pos));
-        if ( leftC && !rightC && !bottomC) { moveRight(); }
-        if (!leftC &&  rightC && !bottomC) { moveLeft();  }
-        if (!leftC && !rightC &&  bottomC) { moveUp();    }
+        if ( leftC && !rightC && !bottomC) this.moveRight();
+        if (!leftC &&  rightC && !bottomC) this.moveLeft();
+        if (!leftC && !rightC &&  bottomC) this.moveUp();
     }
 
     rotateCW() {
@@ -170,7 +173,7 @@ export class GameState {
             }
 
             const fn = ([x, y]) => {
-                const c = m.getValue([x, y]).color;
+                const c = this.board.getValue([x, y]).color;
                 if (c === prev && combo) {
                     combo.push([x, y]);
                 } else {
@@ -180,16 +183,16 @@ export class GameState {
                 }
             }
             
-            for (let x = 0; x < m.w; ++x) { // vertical lines
+            for (let x = 0; x < this.board.w; ++x) { // vertical lines
                 prev = COLOR_NONE;
                 combo = undefined;
-                for (let y = 0; y < m.h; ++y) fn([x, y]);
+                for (let y = 0; y < this.board.h; ++y) fn([x, y]);
                 fnEnd();
             }
-            for (let y = 0; y < m.h; ++y) { // horizontal lines
+            for (let y = 0; y < this.board.h; ++y) { // horizontal lines
                 prev = COLOR_NONE;
                 combo = undefined;
-                for (let x = 0; x < m.w; ++x) fn([x, y]);
+                for (let x = 0; x < this.board.w; ++x) fn([x, y]);
                 fnEnd();
             }
         }
@@ -197,9 +200,9 @@ export class GameState {
         if (combos.length > 0) {
             combos.forEach((combo) => {
                 log(`combo: ${posArrayToString(combo)}`);
-                combo.forEach((pos) => m.getValue(pos).toRemove());
+                combo.forEach((pos) => this.board.getValue(pos).toRemove());
             });
-            m.markCellsT = Date.now() + LEAVE_MS;
+            this.markCellsT = Date.now() + LEAVE_MS;
         }
 
         return combos.length > 0;
@@ -229,9 +232,9 @@ export class GameState {
         sortByYDescending(candidates);
         //if (candidates.length > 0) { log(`candidates: ${posArrayToString(candidates)}`); };
         candidates.forEach((pos) => {
-            if (m.canFallDown(pos)) {
+            if (this.board.canFallDown(pos)) {
                 log(`to fall: ${posToString(pos)}`);
-                m.getValue(pos).falling = true;
+                this.board.getValue(pos).falling = true;
             }
         });
 
@@ -248,7 +251,7 @@ export class GameState {
             log(`falling ${posToString(pos)} -> ${posToString(posDown)}`)
             this.board.swap(pos, posDown);
 
-            if (!m.canFallDown(posDown)) {
+            if (!this.board.canFallDown(posDown)) {
                 log(`stop falling: ${posToString(posDown)}`);
                 this.board.getValue(posDown).falling = false;
                 stopFallingHappened = true;

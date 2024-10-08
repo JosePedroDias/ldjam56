@@ -32,7 +32,6 @@ export async function play() {
     } catch (err) {
         st = new GameState();
     }
-    st.lastMoveT = Date.now();
 
     updateTitle(st);
 
@@ -40,7 +39,7 @@ export async function play() {
     refresh = _refresh;
     
     mainEl.className = 'board';
-    mainEl.style.marginLeft = `-${S/2 * st.board.w.w}px`;
+    mainEl.style.marginLeft = `-${S/2 * st.board.w}px`;
     mainEl.style.marginTop  = `-${S/2 * st.board.h}px`;
 
     document.addEventListener('keydown', (ev) => {
@@ -87,10 +86,11 @@ export async function play() {
             }
 
             if (t - st.lastMoveT >= st.speedMs) { // end of move tick
-                st.moveFallingDown();
+                st.moveFallingDown(); // TODO: hide this logic under logic.mjs?
                 if (st.moveDown()) {
                     st.isGameOver = st.applyPill();
                 }
+                st.updateVirusCount();
                 updateTitle(st);
                 st.lastMoveT = t;
             } 
@@ -104,7 +104,6 @@ export async function play() {
 
     onTick();
 
-    /*
     // gamepad wiring
     const GP_LS = 'gamepad';
     setupGamepad();
@@ -131,8 +130,6 @@ export async function play() {
         else return;
     });
     subscribeToGamepadBindingMessages((msg) => {
-        //console.log(m);
         st.alertText = msg;
     });
-    */
 }
