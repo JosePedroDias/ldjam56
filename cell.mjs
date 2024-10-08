@@ -1,6 +1,9 @@
 import { COLOR_NONE, KIND_EMPTY, KIND_PILL, KIND_VIRUS } from './constants.mjs';
 import { rndI } from './random.mjs';
 
+const CHAR_CODE_A = 'A'.charCodeAt(0);
+const CHAR_CODE_a = 'a'.charCodeAt(0);
+
 export class Cell {
     constructor(color, kind, rotation) {
         this.color = color;
@@ -64,6 +67,8 @@ export class Cell {
 
     toString() {
         if (this.kind === KIND_EMPTY) return '.';
-        return this.color;
+        if (this.kind === KIND_PILL)  return String.fromCharCode(CHAR_CODE_a - 1 + this.color);
+        if (this.kind === KIND_VIRUS) return String.fromCharCode(CHAR_CODE_A - 1 + this.color);
+        return '?';
     }
 }

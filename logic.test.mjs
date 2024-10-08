@@ -26,11 +26,10 @@ function tBoard() {
     assert(st.getPillCollisions().length === 0);
 
     //log(st.board.toString());
-    st.currentPill.pos[1] = 37;
+    st.currentPill.pos[1] = 7;
     //log(st.currentPill.toString());
 
     assert(st.getPillCollisions().length === 2);
-    //log(st.getPillCollisions()); // TODO WRONG
 
     //st.applyPill();
     //log(st.board.toString());
