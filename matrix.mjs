@@ -82,4 +82,16 @@ export class Matrix {
     restore(m) {
         this.fill((pos) => m.getValue(pos).clone());
     }
+
+    toString() {
+        const rows = [];
+        for (let y = 0; y < this.h; ++y) {
+            const row = [];
+            for (let x = 0; x < this.w; ++x) {
+                row.push( this.getValue([x, y]).toString() );
+            }
+            rows.push( row.join('') );
+        }
+        return rows.join('\n');
+    }
 }

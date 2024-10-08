@@ -61,4 +61,9 @@ export class Cell {
         this.falling = false;
         this.counterpart = undefined;
     }
+
+    toString() {
+        if (this.kind === KIND_EMPTY) return '.';
+        return this.color;
+    }
 }

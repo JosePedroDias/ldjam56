@@ -1,247 +1,260 @@
-import { BOARD_H, BOARD_W, COLOR_NONE, KIND_EMPTY, KIND_PILL, LEAVE_MS } from './constants.mjs';
-import { setupLevel } from './levels.mjs';
+import {
+    BOARD_W ,BOARD_H,
+    COLOR_NONE,
+    KIND_EMPTY, KIND_PILL,
+} from './constants.mjs';
 import { Matrix } from './matrix.mjs';
-import { Pill } from './pill.mjs';
 import { Cell } from './cell.mjs';
+import { Pill } from './pill.mjs';
 import { randomColor } from './random.mjs';
-import { PositionSet, posToString, posArrayToString, sortByYDescending } from './position.mjs';
+import { setupLevel } from './levels.mjs';
+import { sortByYDescending } from './position.mjs';
+
+//const log = () => {};
+const log = (...args) => console.log(...args);
 
 function randomPill() {
     return new Pill(randomColor(), randomColor());
 }
 
-const log = () => {};
-//const log = (...args) => console.log(...args);
-
-export function createGame(levelNo) {
-    const m = new Matrix(BOARD_W, BOARD_H);
-    m.level = levelNo;
-    m.fill(() => new Cell(COLOR_NONE, KIND_EMPTY, 0));
-    m.nextP = randomPill();
-    setupLevel(m, levelNo);
-    const p = randomPill();
-    log(`next: ${m.nextP.toString()}`);
-    return [m, p];
-}
-
-export function increaseLevel(m, p) {
-    ++m.level;
-    m.values().forEach((v) => v.clear());
-    m.nextP = randomPill();
-    setupLevel(m, m.level);
-    p.restore(randomPill());
-    log(`next: ${m.nextP.toString()}`);
-}
-
-function getPillCollisions(m, p) {
-    const result = [];
-    p.m.entries().forEach(([[x_, y_], { kind }]) => {
-        const x = (x_ + p.pos[0]);
-        const y = (y_ + p.pos[1]);
-        if (kind === KIND_PILL) {
-            if (!m.positionExists([x, y])) {
-                result.push([x_, y_]); // out of bounds
-            } else {
-                const v = m.getValue([x, y]);
-                if (v.kind !== KIND_EMPTY) result.push([x_, y_]); // collision
-            }
-        }
-    });
-    return result;
-}
-
-function isPillColliding(m, p) {
-    return getPillCollisions(m, p).length > 0;
-}
-
-export function applyPill(m, p) {
-    // copy cells from pill to board
-    p.m.entries().forEach(([[x_, y_], { kind }]) => {
-        const x = (x_ + p.pos[0]);
-        const y = (y_ + p.pos[1]);
-        if (kind === KIND_PILL) {
-            m.setValue([x, y], p.m.getValue([x_, y_]).clone());
-        }
-    });
-
-    markCellsToDelete(m, p);
-
-    // reset new pill
-    p.restore(m.nextP);
-    m.nextP = randomPill();
-    log(`next: ${m.nextP.toString()}`);
-
-    return isPillColliding(m, p);
-}
-
-export function moveLeft(m, p) {
-    p.pos[0] -= 1;
-    const collided = isPillColliding(m, p);
-    if (collided) p.pos[0] += 1;
-    else canMoveDown(m, p);
-    return collided;
-}
-
-export function moveRight(m, p) {
-    p.pos[0] += 1;
-    const collided = isPillColliding(m, p);
-    if (collided) p.pos[0] -= 1;
-    else canMoveDown(m, p);
-    return collided;
-}
-
-function moveUp(m, p) {
-    p.pos[1] -= 1;
-    const collided = isPillColliding(m, p);
-    if (collided) p.pos[1] += 1;
-    return collided;
-}
-
-export function moveDown(m, p, isFake) {
-    p.pos[1] += 1;
-    const collided = isPillColliding(m, p);
-    if (collided) p.pos[1] -= 1;
-    else if (!isFake) canMoveDown(m, p);
-    return collided;
-}
-
-function canMoveDown(m, p) {
-    const cmd = !moveDown(m, p, true);
-    if (cmd) moveUp(m, p);
-    m.canMoveDown = cmd;
-}
-
-export function drop(m, p) {
-    do {
-        p.pos[1] += 1;
-    } while (!isPillColliding(m, p));
-    p.pos[1] -= 1;
-}
-
-function rotate(m, p, isCW) {
-    if (isCW) p.rotateCW();
-    else      p.rotateCCW();
-    const colls = getPillCollisions(m, p);
-    const leftC   = colls.some((pos) => p.isLeftmost(pos));
-    const rightC  = colls.some((pos) => p.isRightmost(pos));
-    const bottomC = colls.some((pos) => p.isBottommost(pos));
-    if ( leftC && !rightC && !bottomC) { moveRight(m, p); }
-    if (!leftC &&  rightC && !bottomC) { moveLeft(m, p);  }
-    if (!leftC && !rightC &&  bottomC) { moveUp(m, p);    }
-}
-
-export function rotateCW(m, p) {
-    rotate(m, p, true);
-}
-
-export function rotateCCW(m, p) {
-    rotate(m, p, false);
-}
-
-export function markCellsToDelete(m) {
-    delete m.markCellsT;
-
-    makeFreePillCellsFall(m, removeMarkedCells(m));
-
-    const combos = [];
-
-    {
-        let prev, combo;
-
-        const fnEnd = () => { 
-            if (!combo || combo.length < 4) return;
-            combos.push(combo);
-        }
-
-        const fn = ([x, y]) => {
-            const c = m.getValue([x, y]).color;
-            if (c === prev && combo) {
-                combo.push([x, y]);
-            } else {
-                fnEnd();
-                prev = c;
-                combo = c ? [[x, y]] : undefined;
-            }
-        }
-        
-        for (let x = 0; x < m.w; ++x) { // vertical lines
-            prev = COLOR_NONE;
-            combo = undefined;
-            for (let y = 0; y < m.h; ++y) fn([x, y]);
-            fnEnd();
-        }
-        for (let y = 0; y < m.h; ++y) { // horizontal lines
-            prev = COLOR_NONE;
-            combo = undefined;
-            for (let x = 0; x < m.w; ++x) fn([x, y]);
-            fnEnd();
-        }
+export class GameState {
+    constructor(levelNo = 0) {
+        this.level = levelNo;
+        this.board = new Matrix(BOARD_W, BOARD_H);
+        this.board.fill(() => new Cell(COLOR_NONE, KIND_EMPTY, 0));
+        setupLevel(this.board, levelNo);
+        this.updateVirusCount();
+        this.currentPill = randomPill();
+        this.nextPill = randomPill();
+        this.score = 0;
+        this.paused = false;
+        this.isGameOver = false;
+        this.speedMs = 750;
+        //this.lastMoveT = Date.now();
+        //this.markCellsT = 0;
+        this.alertText = '';
     }
 
-    if (combos.length > 0) {
-        combos.forEach((combo) => {
-            log(`combo: ${posArrayToString(combo)}`);
-            combo.forEach((pos) => m.getValue(pos).toRemove());
+    increaseLevel() {
+        ++this.level;
+        this.board.values().forEach((v) => v.clear());
+        this.nextPill = randomPill();
+        setupLevel(this.board, this.level);
+        this.currentPill = randomColor();
+    }
+
+    updateVirusCount() {
+        this.virusCount = this.board.values().filter((v) => v.isVirus()).length;
+    }
+
+    togglePause() {
+        this.paused = !this.paused;
+        this.alertText = this.paused ? 'paused' : '';
+    }
+
+    getPillCollisions() {
+        const result = [];
+        this.board.entries().forEach(([[x_, y_], { kind }]) => {
+            const x = (x_ + this.currentPill.pos[0]);
+            const y = (y_ + this.currentPill.pos[1]);
+            if (kind === KIND_PILL) {
+                if (!this.board.positionExists([x, y])) {
+                    result.push([x_, y_]); // out of bounds
+                } else {
+                    const v = this.board.getValue([x, y]);
+                    if (v.kind !== KIND_EMPTY) result.push([x_, y_]); // collision
+                }
+            }
         });
-        m.markCellsT = Date.now() + LEAVE_MS;
+        return result;
     }
 
-    return combos.length > 0;
-}
+    isPillColliding() {
+        return this.getPillCollisions().length > 0;
+    }
 
-export function removeMarkedCells(m) {
-    const left = [];
-    m.entries().forEach(([pos, v]) => {
-        if (!v.leaving) return;
-        log(`clear leaving: ${posToString(pos)}`);
-        v.clearLeaving();
-        left.push(pos);
-    });
-    return left;
-}
+    applyPill() {
+        // copy cells from pill to board
+        this.currentPill.m.entries().forEach(([[x_, y_], { kind }]) => {
+            const x = (x_ + this.currentPill.pos[0]);
+            const y = (y_ + this.currentPill.pos[1]);
+            if (kind === KIND_PILL) {
+                this.board.setValue([x, y], this.currentPill.m.getValue([x_, y_]).clone());
+            }
+        });
 
-export function makeFreePillCellsFall(m, left) {
-    let candidates = new PositionSet();
-    left.forEach(([x, y]) => {
-        let pp;
-        pp = [x-1, y  ]; if (m.positionExists(pp)) candidates.add(pp);
-        pp = [x,   y-1]; if (m.positionExists(pp)) candidates.add(pp);
-        pp = [x+1, y  ]; if (m.positionExists(pp)) candidates.add(pp);
-    });
-    left.forEach(p => candidates.remove(p));
-    candidates = candidates.values();
-    sortByYDescending(candidates);
-    //if (candidates.length > 0) { log(`candidates: ${posArrayToString(candidates)}`); };
-    candidates.forEach((pos) => {
-        if (m.canFallDown(pos)) {
-            log(`to fall: ${posToString(pos)}`);
-            m.getValue(pos).falling = true;
+        this.markCellsToDelete();
+
+        this.currentPill = this.nextPill;
+        this.nextPill = randomPill();
+        return this.isPillColliding();
+    }
+
+    moveLeft() {
+        this.currentPill.pos[0] -= 1;
+        const collided = this.isPillColliding();
+        if (collided) this.currentPill.pos[0] += 1;
+        else this._canMoveDown();
+        return collided;
+    }
+
+    moveRight() {
+        this.currentPill.pos[0] += 1;
+        const collided = this.isPillColliding();
+        if (collided) this.currentPill.pos[0] -= 1;
+        else this._canMoveDown();
+        return collided;
+    }
+
+    moveUp() {
+        this.currentPill.pos[1] -= 1;
+        const collided = this.isPillColliding();
+        if (collided) this.currentPill.pos[1] += 1;
+        return collided;
+    }
+
+    moveDown(isFake) {
+        this.currentPill.pos[1] += 1;
+        const collided = this.isPillColliding();
+        if (collided) this.currentPill.pos[1] -= 1;
+        else if (!isFake) this._canMoveDown();
+        return collided;
+    }
+
+    _canMoveDown() {
+        const cmd = !this.moveDown(true);
+        if (cmd) this.moveUp();
+        this.canMoveDown = cmd;
+    }
+
+    drop() {
+        do {
+            this.currentPill.pos[1] += 1;
+        } while (!this.isPillColliding());
+        this.currentPill.pos[1] -= 1;
+    }
+
+    _rotate(isCW) {
+        if (isCW) this.currentPill.rotateCW();
+        else      this.currentPill.rotateCCW();
+        const colls = this.getPillCollisions();
+        const leftC   = colls.some((pos) => this.currentPill.isLeftmost(pos));
+        const rightC  = colls.some((pos) => this.currentPill.isRightmost(pos));
+        const bottomC = colls.some((pos) => this.currentPill.isBottommost(pos));
+        if ( leftC && !rightC && !bottomC) { moveRight(); }
+        if (!leftC &&  rightC && !bottomC) { moveLeft();  }
+        if (!leftC && !rightC &&  bottomC) { moveUp();    }
+    }
+
+    rotateCW() {
+        this._rotate(true);
+    }
+
+    rotateCCW() {
+        this._rotate(false);
+    }
+
+    markCellsToDelete() {
+        delete this.markCellsT;
+
+        this.makeFreePillCellsFall(this.removeMarkedCells());
+
+        const combos = [];
+
+        {
+            let prev, combo;
+
+            const fnEnd = () => { 
+                if (!combo || combo.length < 4) return;
+                combos.push(combo);
+            }
+
+            const fn = ([x, y]) => {
+                const c = m.getValue([x, y]).color;
+                if (c === prev && combo) {
+                    combo.push([x, y]);
+                } else {
+                    fnEnd();
+                    prev = c;
+                    combo = c ? [[x, y]] : undefined;
+                }
+            }
+            
+            for (let x = 0; x < m.w; ++x) { // vertical lines
+                prev = COLOR_NONE;
+                combo = undefined;
+                for (let y = 0; y < m.h; ++y) fn([x, y]);
+                fnEnd();
+            }
+            for (let y = 0; y < m.h; ++y) { // horizontal lines
+                prev = COLOR_NONE;
+                combo = undefined;
+                for (let x = 0; x < m.w; ++x) fn([x, y]);
+                fnEnd();
+            }
         }
-    });
 
-    // TODO pills above moving pills can move too
-}
-
-export function moveFallingDown(m) {
-    const fallingPositions = m.entries().filter((pair) => pair[1].falling).map(([pos, v]) => pos);
-    sortByYDescending(fallingPositions);
-    //fallingPositions.length > 0 && log(`fallingPositions: ${posArrayToString(fallingPositions)}`);
-    let stopFallingHappened = false;
-    fallingPositions.forEach((pos) => {
-        const posDown = [pos[0], pos[1]+1];
-        log(`falling ${posToString(pos)} -> ${posToString(posDown)}`)
-        m.swap(pos, posDown);
-
-        if (!m.canFallDown(posDown)) {
-            log(`stop falling: ${posToString(posDown)}`);
-            m.getValue(posDown).falling = false;
-            stopFallingHappened = true;
+        if (combos.length > 0) {
+            combos.forEach((combo) => {
+                log(`combo: ${posArrayToString(combo)}`);
+                combo.forEach((pos) => m.getValue(pos).toRemove());
+            });
+            m.markCellsT = Date.now() + LEAVE_MS;
         }
-    });
 
-    if (stopFallingHappened) markCellsToDelete(m);
-}
+        return combos.length > 0;
+    }
 
-export function countViruses(m) {
-    return m.values().filter((v) => v.isVirus()).length;
+    removeMarkedCells() {
+        const left = [];
+        this.board.entries().forEach(([pos, v]) => {
+            if (!v.leaving) return;
+            log(`clear leaving: ${posToString(pos)}`);
+            v.clearLeaving();
+            left.push(pos);
+        });
+        return left;
+    }
+
+    makeFreePillCellsFall(left) {
+        let candidates = new PositionSet();
+        left.forEach(([x, y]) => {
+            let pp;
+            pp = [x-1, y  ]; if (this.board.positionExists(pp)) candidates.add(pp);
+            pp = [x,   y-1]; if (this.board.positionExists(pp)) candidates.add(pp);
+            pp = [x+1, y  ]; if (this.board.positionExists(pp)) candidates.add(pp);
+        });
+        left.forEach(p => candidates.remove(p));
+        candidates = candidates.values();
+        sortByYDescending(candidates);
+        //if (candidates.length > 0) { log(`candidates: ${posArrayToString(candidates)}`); };
+        candidates.forEach((pos) => {
+            if (m.canFallDown(pos)) {
+                log(`to fall: ${posToString(pos)}`);
+                m.getValue(pos).falling = true;
+            }
+        });
+
+        // TODO pills above moving pills can move too
+    }
+
+    moveFallingDown() {
+        const fallingPositions = this.board.entries().filter((pair) => pair[1].falling).map(([pos, v]) => pos);
+        sortByYDescending(fallingPositions);
+        //fallingPositions.length > 0 && log(`fallingPositions: ${posArrayToString(fallingPositions)}`);
+        let stopFallingHappened = false;
+        fallingPositions.forEach((pos) => {
+            const posDown = [pos[0], pos[1]+1];
+            log(`falling ${posToString(pos)} -> ${posToString(posDown)}`)
+            this.board.swap(pos, posDown);
+
+            if (!m.canFallDown(posDown)) {
+                log(`stop falling: ${posToString(posDown)}`);
+                this.board.getValue(posDown).falling = false;
+                stopFallingHappened = true;
+            }
+        });
+
+        if (stopFallingHappened) this.markCellsToDelete();
+    }
 }

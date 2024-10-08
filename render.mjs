@@ -82,9 +82,12 @@ function drawRotated(ctx, sprite, [x, y], ninetyDegTimes) {
     ctx.restore();
 }
 
-function render(el, m, p, { bg, viruses, pills }, r) {
+function render(el, st, { bg, viruses, pills }, r) {
+    const m = st.board;
+    const p = st.currentPill;
+
     let rr = 0;
-    if (r > 0.5 && m.canMoveDown) {
+    if (r > 0.5 && st.canMoveDown) {
         rr = 2 * (r - 0.5);
     }
 
@@ -122,7 +125,7 @@ function render(el, m, p, { bg, viruses, pills }, r) {
 
     // draw next piece
     ctx.globalAlpha = 0.66;
-    m.nextP.m.entries().forEach(([[x_, y_], { color, kind, rotation }]) => {
+    st.nextPill.m.entries().forEach(([[x_, y_], { color, kind, rotation }]) => {
         const x = S * x_;
         const y = S * y_;
         if (kind === KIND_PILL) {
@@ -149,7 +152,7 @@ function render(el, m, p, { bg, viruses, pills }, r) {
     ctx.textBaseline = 'middle';
     
     {
-        const label = `next:         level: ${m.level + 1}     viruses left: ${m.virusesLeft}`;
+        const label = `next:         level: ${st.level + 1}     viruses left: ${st.virusCount}`;
         const xt = S * m.w / 2;
         const yt = S * 0.5;
         ctx.fillStyle = '#000';
@@ -157,15 +160,17 @@ function render(el, m, p, { bg, viruses, pills }, r) {
         ctx.fillStyle = '#7f7';
         ctx.fillText(label, xt, yt);
 
-        if (m.alertText) {
+        if (st.alertText) {
             ctx.font = '15px sans-serif';
-            ctx.fillText(m.alertText, xt, S * m.h / 2);
+            ctx.fillText(st.alertText, xt, S * m.h / 2);
         }
     }
     
 }
 
-export function setupRender(m, p) {
+export function setupRender(st) {
+    const m = st.board;
+
     // prepare static textures
     const sprites = {
         bg: renderBg(createCanvas([m.w, m.h]), m),
@@ -186,7 +191,7 @@ export function setupRender(m, p) {
     
     // setup refresh function
     const refresh = (r) => {
-        render(mainEl, m, p, sprites, r);
+        render(mainEl, st, sprites, r);
     }
 
     return [mainEl, refresh];

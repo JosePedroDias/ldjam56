@@ -1,80 +1,79 @@
 import {
-    KEY_LEFT, KEY_RIGHT, KEY_DOWN, KEY_DROP, KEY_ROT_CW, KEY_ROT_CCW, KEY_ROT_GP_REBIND,
+    KEY_LEFT, KEY_RIGHT, KEY_DOWN, KEY_DROP, KEY_ROT_CW, KEY_ROT_CCW, KEY_ROT_GP_REBIND, KEY_PAUSE,
     GP_LEFT, GP_RIGHT, GP_DOWN, GP_DROP, GP_ROT_CW, GP_ROT_CCW,
     S,
-    KEY_PAUSE,
 } from './constants.mjs';
-import {
-    moveLeft, moveRight, moveDown, drop, rotateCW, rotateCCW,
-    createGame, increaseLevel, applyPill, markCellsToDelete, moveFallingDown, countViruses, 
-} from './logic.mjs';
+import { GameState } from './logic.mjs';
 import { setupRender } from './render.mjs';
-import { setupGamepad, rebindGamepad, getGamepadBindings, setGamepadBindings, subscribeToGamepadEvents, subscribeToGamepadBindingMessages } from './gamepad.mjs';
+import {
+    setupGamepad,
+    rebindGamepad,
+    getGamepadBindings,
+    setGamepadBindings,
+    subscribeToGamepadEvents,
+    subscribeToGamepadBindingMessages,
+} from './gamepad.mjs';
 import { getSearchParam } from './search.mjs';
 
-let m, p, refresh;
-let speedMs = 750;
-let lastMoveT = Date.now();
-let isGameOver = false;
+let refresh;
+let st;
 
-function title(m, p) {
-    const numViruses = countViruses(m);
-    if (numViruses === 0) increaseLevel(m, p);
-    m.virusesLeft = numViruses;
-    document.title = `level: ${m.level}, viruses: ${numViruses}`;
+function updateTitle(st) {
+    document.title = `level: ${st.level}, viruses: ${st.virusCount}`;
 }
 
 export async function play() {
-    let levelNo;
     try {
-        levelNo = getSearchParam('level');
+        let levelNo = getSearchParam('level');
         levelNo = parseInt(levelNo, 10);
         if (!isFinite(levelNo) || levelNo % 1 !== 0 || levelNo < 1 || levelNo > 20) levelNo = 0;
         else --levelNo;
-    } catch (err) {}
+        st = new GameState(levelNo);
+    } catch (err) {
+        st = new GameState();
+    }
+    st.lastMoveT = Date.now();
 
-    [m, p] = createGame(levelNo);
-    title(m, p);
+    updateTitle(st);
 
-    const [mainEl, _refresh] = setupRender(m, p);
+    const [mainEl, _refresh] = setupRender(st);
     refresh = _refresh;
     
     mainEl.className = 'board';
-    mainEl.style.marginLeft = `-${S/2 * m.w}px`;
-    mainEl.style.marginTop  = `-${S/2 * m.h}px`;
+    mainEl.style.marginLeft = `-${S/2 * st.board.w.w}px`;
+    mainEl.style.marginTop  = `-${S/2 * st.board.h}px`;
 
     document.addEventListener('keydown', (ev) => {
         if (ev.altKey || ev.metaKey || ev.ctrlKey) return;
         const key = ev.key;
-        if      (key === KEY_LEFT)    moveLeft(m, p);
-        else if (key === KEY_RIGHT)   moveRight(m, p);
-        else if (key === KEY_DOWN)    moveDown(m, p);
-        else if (key === KEY_DROP)    { drop(m, p); lastMoveT = Date.now() - speedMs; } // force end of move tick
-        else if (key === KEY_ROT_CW)  rotateCW(m, p);
-        else if (key === KEY_ROT_CCW) rotateCCW(m, p);
-        else if (key === KEY_PAUSE) {
-            m.paused = !m.paused;
-            m.alertText = m.paused ? 'paused' : '';
+        if      (key === KEY_LEFT)    st.moveLeft();
+        else if (key === KEY_RIGHT)   st.moveRight();
+        else if (key === KEY_DOWN)    st.moveDown();
+        else if (key === KEY_DROP) {
+            st.drop();
+            st.lastMoveT = Date.now() - st.speedMs; // force end of move tick
         }
+        else if (key === KEY_ROT_CW)  st.rotateCW();
+        else if (key === KEY_ROT_CCW) st.rotateCCW();
+        else if (key === KEY_PAUSE)   st.togglePause();
         else if (key === KEY_ROT_GP_REBIND) {
             rebindGamepad().then(() => {
                 console.warn('bindings complete');
-                m.alertText = undefined;
+                st.alertText = undefined;
                 try {
                     localStorage.setItem(GP_LS, JSON.stringify(getGamepadBindings()));
                 } catch (err) {}
             });
         }
-        //else if (key === 'd') { window.m = m; debugger } // TODO TEMP
+        //else if (key === 'd') { window.st = st; debugger } // TODO TEMP
         else return;
         ev.preventDefault();
         ev.stopPropagation();
     });
 
     const onTick = () => {
-        if (isGameOver) {
-            //window.alert('game over');
-            m.alertText = 'game over!';
+        if (st.isGameOver) {
+            st.alertText = 'game over!';
             refresh();
             return;
         }
@@ -82,22 +81,21 @@ export async function play() {
 
         const t = Date.now();
 
-        if (!m.paused) {
-            if (m.markCellsT && m.markCellsT < t) { // effectively remove marked cells
-                markCellsToDelete(m);
+        if (!st.paused) {
+            if (st.markCellsT && st.markCellsT < t) { // effectively remove marked cells
+                st.markCellsToDelete();
             }
 
-            if (t - lastMoveT >= speedMs) { // end of move tick
-                moveFallingDown(m);
-                if (moveDown(m, p)) {
-                    isGameOver = applyPill(m, p);
+            if (t - st.lastMoveT >= st.speedMs) { // end of move tick
+                st.moveFallingDown();
+                if (st.moveDown()) {
+                    st.isGameOver = st.applyPill();
                 }
-                title(m, p);
-                lastMoveT = t;
+                updateTitle(st);
+                st.lastMoveT = t;
             } 
             
-            const ratio = (t - lastMoveT) / speedMs;
-            refresh(ratio);
+            refresh( (t - st.lastMoveT) / st.speedMs );
         } else {
             refresh(0);
         }
@@ -106,6 +104,7 @@ export async function play() {
 
     onTick();
 
+    /*
     // gamepad wiring
     const GP_LS = 'gamepad';
     setupGamepad();
@@ -120,16 +119,20 @@ export async function play() {
     } catch (err) {}
 
     subscribeToGamepadEvents((action) => {
-        if      (action === GP_LEFT)    moveLeft(m, p);
-        else if (action === GP_RIGHT)   moveRight(m, p);
-        else if (action === GP_DOWN)    moveDown(m, p);
-        else if (action === GP_DROP)    { drop(m, p); lastMoveT = Date.now() - speedMs; } // force end of move tick
-        else if (action === GP_ROT_CW)  rotateCW(m, p);
-        else if (action === GP_ROT_CCW) rotateCCW(m, p);
+        if      (action === GP_LEFT)    st.moveLeft();
+        else if (action === GP_RIGHT)   st.moveRight();
+        else if (action === GP_DOWN)    st.moveDown();
+        else if (action === GP_DROP)    {
+            this.drop();
+            st.lastMoveT = Date.now() - speedMs; // force end of move tick
+        }
+        else if (action === GP_ROT_CW)  st.rotateCW();
+        else if (action === GP_ROT_CCW) st.rotateCCW();
         else return;
     });
     subscribeToGamepadBindingMessages((msg) => {
         //console.log(m);
-        m.alertText = msg;
+        st.alertText = msg;
     });
+    */
 }

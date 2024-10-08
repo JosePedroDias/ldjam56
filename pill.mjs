@@ -89,8 +89,12 @@ export class Pill {
         this.m.restore(c.m);
     }
 
+    getColors() {
+        return this.m.values().filter((v) => v.isFilled());
+    }
+
     toString() {
-        const [vA, vB] = this.m.values().filter((v) => v.isFilled());
-        return `${vA.color}${vB.color}`;
+        return `pos: ${this.pos.join(',')}; rot: ${this.rotation}
+${this.m.toString()}`
     }
 }
