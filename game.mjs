@@ -5,6 +5,7 @@ import {
 } from './constants.mjs';
 import { GameState } from './logic.mjs';
 import { setupRender } from './render.mjs';
+import { setupMobile } from './mobile.mjs';
 import {
     setupGamepad,
     rebindGamepad,
@@ -132,4 +133,13 @@ export async function play() {
     subscribeToGamepadBindingMessages((msg) => {
         st.alertText = msg;
     });
+
+    setupMobile([
+        ['left',  () => st.moveLeft()],
+        ['right', () => st.moveRight()],
+        ['down',  () => st.moveDown()],
+        //['drop',  () => st.drop()],
+        ['cw',    () => st.rotateCW()],
+        //['ccw',   () => st.rotateCCW()],
+    ]);
 }

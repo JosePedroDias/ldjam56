@@ -1,6 +1,10 @@
 html, body {
     margin: 0;
     height: 100%;
+
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 
 body {
@@ -11,5 +15,20 @@ body {
 .board {
     position: absolute;
     left: 50%;
-    top: 50%;
+    top:  50%;
 }
+
+.hud-btn {
+    position: absolute;
+    width:  8em;
+    height: 8em;
+    bottom: 8em;
+    /*font-size: 300%;*/
+}
+
+.b-left {  left:  8em }
+.b-right { left: 24em }
+
+.b-down {   right: 24em }
+.b-cw     { right:  8em }
+

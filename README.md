@@ -40,7 +40,6 @@ No images, libraries or timers used.
 - (infrequent but wrong) pills above moving pills should fall too
 - twist from original game? (actually there's an accidental difference: lines match mid-air)
 - falling due to gravity could be faster?
-- (nice to have) overlay buttons for mobile?
 - (nice to have) broken pills should get to be round
 
 - gamepad: show gamepad messages using a dom element instead of console

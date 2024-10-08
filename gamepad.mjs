@@ -100,7 +100,7 @@ function makeDiscrete(v) {
 
 function readGamepad() {
     const gp = navigator.getGamepads()[0];
-    if (!gp) return;
+    if (!gp) return false;
 
     if (!state) {
         state = {
@@ -122,9 +122,12 @@ function readGamepad() {
             state.axes[i] = v;
         });
     }
+
+    return true;
 }
 
 export function setupGamepad() {
+    if (!readGamepad()) return console.log('no gamepad detected');
     const onTick = () => {
         requestAnimationFrame(onTick);
         const t = Date.now();
