@@ -6,7 +6,9 @@ import { setupRender } from './render.mjs';
 ////
 
 //import assert from 'node:assert/strict';
-function assert(expr, message) { if (!Boolean(expr)) { throw new Error(message || 'unknown assertion error'); } }
+const DEF_ERR_MSG = 'unknown assertion error';
+function assert(expr, msg = DEF_ERR_MSG) { if (!Boolean(expr)) throw new Error(msg); }
+function assertEqual(a, b, msg = DEF_ERR_MSG) { if (a != b) { throw new Error(`${msg} (${a} != ${b})`) } }
 const log = (...args) => console.log(...args);
 
 if (globalThis.document) {
@@ -31,24 +33,24 @@ function countChars(str, ch) {
 
 function tRandom() {
     deterministicWithSeed(42);
-    assert(rndI(100) === 60, 'deterministic PRNG works');
-    assert(rndI(100) === 44 );
-    assert(rndI(100) === 85 );
+    assertEqual(rndI(100), 60, 'deterministic PRNG works');
+    assertEqual(rndI(100), 44);
+    assertEqual(rndI(100), 85);
 }
 
 function tBoard() {
     deterministicWithSeed(46);
     const st = new GameState(10);
-    assert(st.board.w ===  8, 'board width  is  8');
-    assert(st.board.h === 16, 'board height is 16');
+    assertEqual(st.board.w, 8, 'board width');
+    assertEqual(st.board.h, 16, 'board height');
 
-    assert(st.getPillCollisions().length === 0, 'no collisions ocurred');
+    assertEqual(st.getPillCollisions().length, 0, 'no collisions ocurred');
 
     //log(st.board.toString());
     st.currentPill.pos[1] = 7;
     //log(st.currentPill.toString());
 
-    assert(st.getPillCollisions().length === 1, '1 collision ocurred');
+    assertEqual(st.getPillCollisions().length, 1, '1 collision ocurred');
 
     st.applyPill();
     //log(st.board.toString());
@@ -83,11 +85,11 @@ function tLines() {
     st.applyPill();
 
     const leavingShot = st.board.toString(TO_STRING_LEAVING);
-    assert( countChars(leavingShot, 'L') === 4, '4 cells should have been marked for leaving');
+    assertEqual( countChars(leavingShot, 'L'), 4, '4 cells should have been marked for leaving');
     //log(leavingShot);
     st.markCellsToDelete();
     const fallingShot = st.board.toString(TO_STRING_FALLING);
-    assert( countChars(fallingShot, 'F') === 3, '3 cells should have been marked for falling'); // TODO: FAILS
+    assertEqual( countChars(fallingShot, 'F'), 3, '3 cells should have been marked for falling'); // TODO: FAILS
     //log(fallingShot); // WRONG! ONE CELL LEFT TO FALL!
 
     refresh(0);
