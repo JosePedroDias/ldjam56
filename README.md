@@ -41,7 +41,8 @@ No images, libraries or timers used.
 - increase game speed over levels
 - (nice to have) as pills get split, the remaining halves become round
 - keyboard: redefine keys, accept caps?
-- basic animations (fade, scale)
+- fix lack of animation on first row
+- basic animations (fade, scale), easing?
 - actual sprites instead of geometric figures?
 - twist from original game (??)
 - port to go/nakama or use peerjs to do multiplayer (when doing head to head)

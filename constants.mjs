@@ -22,9 +22,9 @@ export const COLORS = [
     'red',
 ];
 
-export const KEY_LEFT    = 'ArrowLeft';
-export const KEY_RIGHT   = 'ArrowRight';
-export const KEY_DOWN    = 'ArrowDown';
+export const KEY_LEFT    = 'arrowleft';
+export const KEY_RIGHT   = 'arrowright';
+export const KEY_DOWN    = 'arrowdown';
 export const KEY_DROP    = ' ';
 export const KEY_ROT_CW  = 'z';
 export const KEY_ROT_CCW = 'x';

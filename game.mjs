@@ -45,7 +45,7 @@ export async function play() {
 
     document.addEventListener('keydown', (ev) => {
         if (ev.altKey || ev.metaKey || ev.ctrlKey) return;
-        const key = ev.key;
+        const key = ev.key.toLowerCase(); // to allow for caps/shift to be pressed
         if      (key === KEY_LEFT)    st.moveLeft();
         else if (key === KEY_RIGHT)   st.moveRight();
         else if (key === KEY_DOWN)    st.moveDown();
