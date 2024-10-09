@@ -27,7 +27,7 @@ export class GameScreen {
         const W = S * BOARD_W;
         const H = S * BOARD_H;
 
-        this.canvas = createCanvas([W, H], true);
+        this.canvas = createCanvas([W, H]);
         this.sprites = {
             bg: bg(st.board),
             viruses: [

@@ -10,6 +10,8 @@ function countChars(str, ch) {
     return str.split('').reduce((prev, curr) => curr === ch ? prev + 1 : prev, 0);
 }
 
+const SHOW_CANVASES = true;
+
 ////
 
 function tBoard() {
@@ -37,6 +39,7 @@ function tRender() {
     st.setLevel(3);
     const gs = new GameScreen(st);
     gs.update(0);
+    SHOW_CANVASES && document.body.appendChild(gs.canvas);
 }
 
 function tLines() {
@@ -73,6 +76,7 @@ function tLines() {
     //log(fallingShot); // WRONG! ONE CELL LEFT TO FALL!
 
     gs.update(0);
+    SHOW_CANVASES && document.body.appendChild(gs.canvas);
 }
 
 ////

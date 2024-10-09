@@ -4,7 +4,7 @@ import {
     S, GP_LS, SCORE_LS,
 } from './constants.mjs';
 import { GameState } from './logic/logic.mjs';
-import { GameScreen } from './output/game-screen.mjs';
+import { RootScreen } from './output/root-screen.mjs';
 import { setupMobile } from './input/mobile.mjs';
 import {
     setupGamepad,
@@ -35,17 +35,20 @@ export async function play() {
 
         const text = `level:${st.level}    virus:${st.virusCount}\nscore:${st.score}    high:${high} `;
         document.title = text;
-        gs.setStatsText(text);
+        screen.setStatsText(text);
     }
 
     const st = new GameState(updateStats);
-    const gs = new GameScreen(st);
-    const refresh = (r) => gs.update(r);
+    const screen = new RootScreen(st);
+    screen.toGameScreen();
+    //screen.toTitleScreen();
+
+    const refresh = (r) => screen.update(r);
     
-    const mainEl = gs.canvas;
+    const mainEl = screen.canvas;
     mainEl.className = 'board';
-    mainEl.style.marginLeft = `-${S/2 * st.board.w}px`;
-    mainEl.style.marginTop  = `-${S/2 * st.board.h}px`;
+    mainEl.style.marginLeft = `-${screen.dims2[0]}px`;
+    mainEl.style.marginTop  = `-${screen.dims2[1]}px`;
 
     st.setLevel(levelNo);
 
@@ -63,12 +66,12 @@ export async function play() {
         else if (key === KEY_ROT_CCW) st.rotateCCW();
         else if (key === KEY_PAUSE) {
             st.togglePause();
-            gs.setAlertText(st.paused ? 'game paused' : '');
+            screen.setAlertText(st.paused ? 'game paused' : '');
         }
         else if (key === KEY_ROT_GP_REBIND) {
             rebindGamepad().then(() => {
                 console.warn('bindings complete');
-                gs.setAlertText('');
+                screen.setAlertText('');
                 writeData(GP_LS, getGamepadBindings());
             });
         }
@@ -80,7 +83,7 @@ export async function play() {
 
     const onTick = () => {
         if (st.isGameOver) {
-            gs.setAlertText('game over!');
+            screen.setAlertText('game over!');
             refresh();
             return;
         }
@@ -136,7 +139,7 @@ export async function play() {
         else return;
     });
     subscribeToGamepadBindingMessages((msg) => {
-        gs.setAlertText(msg);
+        screen.setAlertText(msg);
     });
 
     setupMobile([
