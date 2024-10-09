@@ -171,12 +171,22 @@ export async function play() {
     });
 
     setupMobile([
-        ['left',  () => st.moveLeft()],
-        ['right', () => st.moveRight()],
-        ['down',  () => st.moveDown()],
-        //['drop',  () => st.drop()],
-        ['cw',    () => st.rotateCW()],
-        //['ccw',   () => st.rotateCCW()],
+        ['left', () => {
+            if (screen.showingTitle) screen.decreaseLevel();
+            else st.moveLeft();
+        }],
+        ['right', () => {
+            if (screen.showingTitle) screen.increaseLevel();
+            else st.moveRight();
+        }],
+        ['down', () => {
+            if (screen.showingTitle) screen.toGameScreen();
+            else st.moveDown();
+        }],
+        ['cw', () => {
+            if (screen.showingTitle) screen.toGameScreen();
+            else st.rotateCW();
+        }],
     ]);
 }
 

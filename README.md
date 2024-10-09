@@ -46,6 +46,7 @@ No images, libraries or timers used.
 - port to go/nakama or use peerjs to do multiplayer (when doing head to head)
 
 ### visuals
+- mobile layout (flip vertical)
 - display next piece and stats outside of the board
 - (nice to have) as pills get split, the remaining halves become round
 - basic animations (fade, scale), easing?
