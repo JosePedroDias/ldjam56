@@ -35,13 +35,3 @@ export class PositionSet {
         return Array.from(this._map.values());
     }
 }
-
-/*
-ps = new PositionSet()
-ps.add([1, 0])
-ps.has([0, 0])
-ps.has([1, 0])
-ps.add([2, 3])
-ps.add([2, 3])
-ps.values()
-*/

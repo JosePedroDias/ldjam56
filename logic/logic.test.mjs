@@ -1,35 +1,16 @@
-import { resetToDefaultPRNG, deterministicWithSeed, rndI } from './random.mjs';
+import { assertEqual, runTests } from './test-utils.mjs';
+import { deterministicWithSeed, rndI } from './random.mjs';
 import { TO_STRING_FALLING, TO_STRING_LEAVING } from './cell.mjs';
 import { GameState } from './logic.mjs';
 import { setupRender } from '../output/render.mjs';
 
 ////
 
-//import assert from 'node:assert/strict';
-const DEF_ERR_MSG = 'unknown assertion error';
-function assert(expr, msg = DEF_ERR_MSG) { if (!Boolean(expr)) throw new Error(msg); }
-function assertEqual(a, b, msg = DEF_ERR_MSG) { if (a != b) { throw new Error(`${msg} (${a} != ${b})`) } }
-const log = (...args) => console.log(...args);
-
-if (globalThis.document) {
-    window.onerror = function(msg, url, line, col, err) {
-        window.alert(`${msg}
-    ${err.stack}`);
-        return false;
-    };
-}
-
-////
-
-function removeCanvases() {
-    Array.from(document.querySelectorAll('canvas')).forEach((el) => {
-        el.parentNode.removeChild(el);
-    });
-}
-
 function countChars(str, ch) {
     return str.split('').reduce((prev, curr) => curr === ch ? prev + 1 : prev, 0);
 }
+
+////
 
 function tRandom() {
     deterministicWithSeed(42);
@@ -101,16 +82,10 @@ function tGravity() {
 
 ////
 
-[
+runTests([
     tRandom,
     tBoard,
     tRender,
     tLines,
     tGravity,
-].forEach((fn) => {
-    resetToDefaultPRNG();
-    fn();
-    const name = fn.name;
-    console.log(`✅ ${name}`);
-    //removeCanvases();
-});
+]);
