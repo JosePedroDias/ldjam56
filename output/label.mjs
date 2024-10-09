@@ -2,11 +2,11 @@ import { createCanvas } from './render.mjs';
 
 export class Label {
     constructor(text = "", dims = [128, 64], color = 'white', fontSize = 12, fontFamily = 'sans-serif') {
-        this.text = text;
         this.dims = dims;
         this.color = color;
         this.fontSize = fontSize;
         this.fontFamily = fontFamily;
+        this.lineHeight = fontSize;
 
         this.posRatio = [0.5, 0.5];
         this.textAlign = 'center';
@@ -20,6 +20,8 @@ export class Label {
 
         this.strokeColor = 'black';
         this.strokeWidth = 0;
+
+        this.setText(text)
     }
 
     setColor(color) {
@@ -40,8 +42,19 @@ export class Label {
         return this;
     }
 
+    setLineHeight(lh) {
+        this.lineHeight = lh;
+        this.setText(this.text);
+        return this;
+    }
+
     setText(text) {
         this.text = text;
+        this.lines = text.split('\n');
+        const x = this.posRatio[0] * this.dims[0];
+        let y = this.posRatio[1] * this.dims[1];
+        y += this.lineHeight * this.lines.length * 0.25 - (this.lineHeight - this.fontSize);
+        this.pos = [x, y];
         this.isDirty = true;
         return this;
     }
@@ -77,23 +90,29 @@ export class Label {
         const ctx = this.canvas.getContext('2d');
         ctx.clearRect(0, 0, this.dims[0], this.dims[1]);
 
-        // ctx.strokeStyle = 'white'; ctx.strokeRect(0, 0, this.dims[0], this.dims[1]); // debug size
+        // ctx.strokeStyle = 'red'; ctx.strokeRect(0, 0, this.dims[0], this.dims[1]); // debug size
 
         ctx.font = `${this.textWeight ? this.textWeight + ' ' : ''}${this.fontSize}px ${this.fontFamily}`;
         ctx.textAlign = this.textAlign
         ctx.textBaseline = this.textBaseline;
 
-        const x = this.posRatio[0] * this.dims[0];
-        const y = this.posRatio[1] * this.dims[1];
-
+        let [x, y] = this.pos;
+        let i = 0;
         if (this.strokeWidth) {
             ctx.strokeStyle = this.strokeColor;
             ctx.lineWidth = this.strokeWidth;
-            ctx.strokeText(this.text, x, y);
+            for (let line of this.lines) {
+                ctx.strokeText(line, x, y + this.lineHeight * i++);
+            }
+            
         }
 
         ctx.fillStyle = this.color;
-        ctx.fillText(this.text, x, y);
+        [x, y] = this.pos;
+        i = 0;
+        for (let line of this.lines) {
+            ctx.fillText(line, x, y + this.lineHeight * i++);
+        }
     }
 
     getCanvas() {

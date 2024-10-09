@@ -1,7 +1,7 @@
 import {
     KEY_LEFT, KEY_RIGHT, KEY_DOWN, KEY_DROP, KEY_ROT_CW, KEY_ROT_CCW, KEY_ROT_GP_REBIND, KEY_PAUSE,
     GP_LEFT, GP_RIGHT, GP_DOWN, GP_DROP, GP_ROT_CW, GP_ROT_CCW,
-    S,
+    S, GP_LS, SCORE_LS,
 } from './constants.mjs';
 import { GameState } from './logic/logic.mjs';
 import { GameScreen } from './output/game-screen.mjs';
@@ -27,7 +27,13 @@ export async function play() {
     } catch (err) {}
 
     function updateStats(st) {
-        const text = `level:${st.level}     score:${st.score}     virus:${st.virusCount}`;
+        let high = readData(SCORE_LS) || 0;
+        if (st.score > high) {
+            high = st.score;
+            writeData(SCORE_LS, high);
+        }
+
+        const text = `level:${st.level}    virus:${st.virusCount}\nscore:${st.score}    high:${high} `;
         document.title = text;
         gs.setStatsText(text);
     }
@@ -106,7 +112,6 @@ export async function play() {
     onTick();
 
     // gamepad wiring
-    const GP_LS = 'gamepad';
     setupGamepad();
 
     try {

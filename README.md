@@ -37,7 +37,6 @@ No images, libraries or timers used.
 ## TODO
 
 - title screen with level choice
-- score and high scores
 - piece going down and gravity being mutually exclusive modes
 - (nice to have) as pills get split, the remaining halves become round
 - keyboard: redefine keys, accept caps?

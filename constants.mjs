@@ -40,3 +40,7 @@ export const GP_ROT_CW  = 'rcw';
 export const GP_ROT_CCW = 'rccw';
 
 export const GP_ACTIONS = [ GP_LEFT, GP_RIGHT, GP_DOWN, GP_DROP, GP_ROT_CW, GP_ROT_CCW ];
+
+// local storage keys
+export const GP_LS = 'gamepad';
+export const SCORE_LS = 'score';

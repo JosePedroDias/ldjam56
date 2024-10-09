@@ -45,7 +45,7 @@ export class GameScreen {
         };
 
         this.labels = {
-            stats: new Label('', [W, 48], 'white', 24).setWeight(600).setStroke(3, 'rgba(255,0,255,0.5)'),
+            stats: new Label('', [W, 128], 'white', 24).setWeight(600).setStroke(3, 'rgba(255,0,255,0.5)').setLineHeight(32),
             alert: new Label('', [W, 48], 'white', 20).setWeight(600).setStroke(4, 'rgba(0,0,0,0.5)'),
         };
     }
@@ -110,7 +110,7 @@ export class GameScreen {
     
         // labels
         let [dx, dy] = stats.getHalfSize();
-        ctx.drawImage(stats.getCanvas(), W2 - dx, S * 0.5 - dy);
+        ctx.drawImage(stats.getCanvas(), W2 - dx, S * 0.3 - dy);
 
         [dx, dy] = alert.getHalfSize();
         ctx.drawImage(alert.getCanvas(), W2 - dx, H2 - dy);
