@@ -1,5 +1,5 @@
-import { COLOR_NONE, KIND_EMPTY, KIND_PILL } from './constants.mjs';
-import { Matrix } from './matrix.mjs';
+import { COLOR_NONE, KIND_EMPTY, KIND_PILL } from '../constants.mjs';
+import { PFMatrix } from './pf-matrix.mjs';
 import { Cell } from './cell.mjs';
 
 function mod4(n, i) {
@@ -8,7 +8,7 @@ function mod4(n, i) {
 
 export class Pill {
     constructor(colorTop, colorBottom) {
-        this.m = new Matrix(3, 3);
+        this.m = new PFMatrix(3, 3);
         this.pos = [3, -1];
         this.rotation = 0;
         this.m.fill(([x, y]) => {
@@ -79,13 +79,6 @@ export class Pill {
         c.pos[0] = this.pos[0];
         c.m = this.m.clone();
         return c;
-    }
-
-    restore(c) {
-        this.rotation = c.rotation;
-        this.pos[1] = c.pos[1];
-        this.pos[0] = c.pos[0];
-        this.m.restore(c.m);
     }
 
     getColors() {

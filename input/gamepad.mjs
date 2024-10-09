@@ -6,7 +6,7 @@ let bindings = new Map();
 let inBindingMode = false;
 let yetToBind = [];
 
-import { GP_ACTIONS } from './constants.mjs';
+import { GP_ACTIONS } from '../constants.mjs';
 
 let onGamepadEventHandler = () => {};
 let onGamepadBindingMessage = () => {};

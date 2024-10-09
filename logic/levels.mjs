@@ -1,4 +1,4 @@
-import { COLOR_NONE, KIND_EMPTY, KIND_VIRUS } from './constants.mjs';
+import { COLOR_NONE, KIND_EMPTY, KIND_VIRUS } from '../constants.mjs';
 import { rndF01, randomColor } from './random.mjs';
 import { Cell } from './cell.mjs';
 

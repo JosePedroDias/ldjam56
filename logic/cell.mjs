@@ -1,4 +1,4 @@
-import { COLOR_NONE, KIND_EMPTY, KIND_PILL, KIND_VIRUS } from './constants.mjs';
+import { COLOR_NONE, KIND_EMPTY, KIND_PILL, KIND_VIRUS } from '../constants.mjs';
 import { rndI } from './random.mjs';
 
 const CHAR_CODE_A = 'A'.charCodeAt(0);

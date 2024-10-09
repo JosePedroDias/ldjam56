@@ -3,20 +3,22 @@ import {
     KIND_PILL, KIND_VIRUS,
     S,
     COLORS,
-} from './constants.mjs';
+} from '../constants.mjs';
 
 const rad180 = Math.PI;
 const rad90  = rad180 / 2;
 const rad360 = rad180 * 2;
 
-function createCanvas([w, h], toAppend) {
+export function createCanvas([w, h], toAppend) {
     const el = document.createElement('canvas');
     el.setAttribute('width', S * w);
     el.setAttribute('height', S * h);
-    if (toAppend) {
-        document.body.appendChild(el);
-    }
+    if (toAppend) document.body.appendChild(el);
     return el;
+}
+
+export class Label {
+
 }
 
 function renderBg(el, m) {

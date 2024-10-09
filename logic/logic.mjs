@@ -3,8 +3,8 @@ import {
     COLOR_NONE,
     KIND_EMPTY, KIND_PILL,
     LEAVE_MS, FALL_MS,
-} from './constants.mjs';
-import { Matrix } from './matrix.mjs';
+} from '../constants.mjs';
+import { PFMatrix } from './pf-matrix.mjs';
 import { Cell } from './cell.mjs';
 import { Pill } from './pill.mjs';
 import { randomColor } from './random.mjs';
@@ -21,7 +21,7 @@ function randomPill() {
 export class GameState {
     constructor(levelNo = 0) {
         this.level = levelNo;
-        this.board = new Matrix(BOARD_W, BOARD_H);
+        this.board = new PFMatrix(BOARD_W, BOARD_H);
         this.clearBoard();
         setupLevel(this.board, levelNo);
         this.updateVirusCount();

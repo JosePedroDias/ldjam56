@@ -3,9 +3,9 @@ import {
     GP_LEFT, GP_RIGHT, GP_DOWN, GP_DROP, GP_ROT_CW, GP_ROT_CCW,
     S,
 } from './constants.mjs';
-import { GameState } from './logic.mjs';
-import { setupRender } from './render.mjs';
-import { setupMobile } from './mobile.mjs';
+import { GameState } from './logic/logic.mjs';
+import { setupRender } from './output/render.mjs';
+import { setupMobile } from './input/mobile.mjs';
 import {
     setupGamepad,
     rebindGamepad,
@@ -13,8 +13,8 @@ import {
     setGamepadBindings,
     subscribeToGamepadEvents,
     subscribeToGamepadBindingMessages,
-} from './gamepad.mjs';
-import { getSearchParam } from './search.mjs';
+} from './input/gamepad.mjs';
+import { getSearchParam } from './input/search.mjs';
 
 let refresh;
 let st;
@@ -142,3 +142,5 @@ export async function play() {
         //['ccw',   () => st.rotateCCW()],
     ]);
 }
+
+play();

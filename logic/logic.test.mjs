@@ -1,7 +1,7 @@
+import { resetToDefaultPRNG, deterministicWithSeed, rndI } from './random.mjs';
 import { TO_STRING_FALLING, TO_STRING_LEAVING } from './cell.mjs';
 import { GameState } from './logic.mjs';
-import { resetToDefaultPRNG, deterministicWithSeed, rndI } from './random.mjs';
-import { setupRender } from './render.mjs';
+import { setupRender } from '../output/render.mjs';
 
 ////
 
