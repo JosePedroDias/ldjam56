@@ -34,14 +34,19 @@ No images, libraries or timers used.
     - https://simon.html5.org/dump/html5-canvas-cheat-sheet.html
     - https://developer.mozilla.org/en-US/docs/Web/API/Gamepad_API , https://developer.mozilla.org/en-US/docs/Web/API/Gamepad_API/Using_the_Gamepad_API
 
+
 ## TODO
 
-- title screen with level choice
+### features
 - piece going down and gravity being mutually exclusive modes
-- (nice to have) as pills get split, the remaining halves become round
-- keyboard: redefine keys, accept caps?
+- keyboard: redefine keys
 - fix lack of animation on first row
-- basic animations (fade, scale), easing?
-- actual sprites instead of geometric figures?
+- 2 player split screen
 - twist from original game (??)
 - port to go/nakama or use peerjs to do multiplayer (when doing head to head)
+
+### visuals
+- display next piece and stats outside of the board
+- (nice to have) as pills get split, the remaining halves become round
+- basic animations (fade, scale), easing?
+- actual sprites instead of geometric figures?

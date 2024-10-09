@@ -30,6 +30,7 @@ export const KEY_ROT_CW  = 'z';
 export const KEY_ROT_CCW = 'x';
 export const KEY_ROT_GP_REBIND = '1';
 export const KEY_PAUSE   = 'p';
+export const KEY_ENTER   = 'enter';
 // TODO keyboard rebind
 
 export const GP_LEFT    = 'left';
@@ -44,3 +45,4 @@ export const GP_ACTIONS = [ GP_LEFT, GP_RIGHT, GP_DOWN, GP_DROP, GP_ROT_CW, GP_R
 // local storage keys
 export const GP_LS = 'gamepad';
 export const SCORE_LS = 'score';
+export const LEVEL_LS = 'level';

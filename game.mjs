@@ -2,6 +2,7 @@ import {
     KEY_LEFT, KEY_RIGHT, KEY_DOWN, KEY_DROP, KEY_ROT_CW, KEY_ROT_CCW, KEY_ROT_GP_REBIND, KEY_PAUSE,
     GP_LEFT, GP_RIGHT, GP_DOWN, GP_DROP, GP_ROT_CW, GP_ROT_CCW,
     S, GP_LS, SCORE_LS,
+    KEY_ENTER,
 } from './constants.mjs';
 import { GameState } from './logic/logic.mjs';
 import { RootScreen } from './output/root-screen.mjs';
@@ -40,8 +41,7 @@ export async function play() {
 
     const st = new GameState(updateStats);
     const screen = new RootScreen(st);
-    screen.toGameScreen();
-    //screen.toTitleScreen();
+    screen.toTitleScreen();
 
     const refresh = (r) => screen.update(r);
     
@@ -55,28 +55,51 @@ export async function play() {
     document.addEventListener('keydown', (ev) => {
         if (ev.altKey || ev.metaKey || ev.ctrlKey) return;
         const key = ev.key.toLowerCase(); // to allow for caps/shift to be pressed
-        if      (key === KEY_LEFT)    st.moveLeft();
-        else if (key === KEY_RIGHT)   st.moveRight();
-        else if (key === KEY_DOWN)    st.moveDown();
-        else if (key === KEY_DROP) {
-            st.drop();
-            st.lastMoveT = Date.now() - st.speedMs; // force end of move tick
+
+        if (screen.showingTitle) {
+            switch (key) {
+                case KEY_ENTER: {
+                    screen.toGameScreen();
+                    break;
+                }
+                case KEY_RIGHT:
+                case KEY_DOWN: {
+                    screen.increaseLevel();
+                    break;
+                }
+                case KEY_LEFT:
+                case KEY_UP: {
+                    screen.decreaseLevel();
+                    break;
+                }
+                default:
+                    return;
+            }
+        } else {
+            if      (key === KEY_LEFT)    st.moveLeft();
+            else if (key === KEY_RIGHT)   st.moveRight();
+            else if (key === KEY_DOWN)    st.moveDown();
+            else if (key === KEY_DROP) {
+                st.drop();
+                st.lastMoveT = Date.now() - st.speedMs; // force end of move tick
+            }
+            else if (key === KEY_ROT_CW)  st.rotateCW();
+            else if (key === KEY_ROT_CCW) st.rotateCCW();
+            else if (key === KEY_PAUSE) {
+                st.togglePause();
+                screen.setAlertText(st.paused ? 'game paused' : '');
+            }
+            else if (key === KEY_ROT_GP_REBIND) {
+                rebindGamepad().then(() => {
+                    console.warn('bindings complete');
+                    screen.setAlertText('');
+                    writeData(GP_LS, getGamepadBindings());
+                });
+            }
+            //else if (key === 'd') { window.st = st; debugger } // TODO TEMP
+            else return;
         }
-        else if (key === KEY_ROT_CW)  st.rotateCW();
-        else if (key === KEY_ROT_CCW) st.rotateCCW();
-        else if (key === KEY_PAUSE) {
-            st.togglePause();
-            screen.setAlertText(st.paused ? 'game paused' : '');
-        }
-        else if (key === KEY_ROT_GP_REBIND) {
-            rebindGamepad().then(() => {
-                console.warn('bindings complete');
-                screen.setAlertText('');
-                writeData(GP_LS, getGamepadBindings());
-            });
-        }
-        //else if (key === 'd') { window.st = st; debugger } // TODO TEMP
-        else return;
+        
         ev.preventDefault();
         ev.stopPropagation();
     });
@@ -91,7 +114,7 @@ export async function play() {
 
         const t = Date.now();
 
-        if (!st.paused) {
+        if (!st.paused && !screen.showingTitle) {
             if (st.markCellsT && st.markCellsT < t) { // effectively remove marked cells
                 st.markCellsToDelete();
             }
@@ -127,6 +150,11 @@ export async function play() {
     } catch (err) {}
 
     subscribeToGamepadEvents((action) => {
+        if (screen.showingTitle) {
+            screen.toGameScreen();
+            return;
+        }
+
         if      (action === GP_LEFT)    st.moveLeft();
         else if (action === GP_RIGHT)   st.moveRight();
         else if (action === GP_DOWN)    st.moveDown();

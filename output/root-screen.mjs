@@ -15,7 +15,7 @@ export class RootScreen {
         this.title = new TitleScreen(st);
         this.game = new GameScreen(st);
 
-        this.showTitle = true;
+        this.showingTitle = true;
 
         this.canvas = createCanvas([W, H], true);
     }
@@ -24,7 +24,7 @@ export class RootScreen {
         const [W, H] = this.dims;
 
         let screen;
-        if (this.showTitle) {
+        if (this.showingTitle) {
             screen = this.title;
         } else {
             screen = this.game;
@@ -37,12 +37,24 @@ export class RootScreen {
     }
 
     toTitleScreen() {
-        this.showTitle = true;
+        this.showingTitle = true;
     }
 
     toGameScreen() {
-        this.showTitle = false;
+        this.showingTitle = false;
     }
+
+    ////
+
+    increaseLevel() {
+        this.title.increaseLevel();
+    }
+
+    decreaseLevel() {
+        this.title.decreaseLevel();
+    }
+
+    ////
 
     setStatsText(text) {
         this.game.setStatsText(text);
