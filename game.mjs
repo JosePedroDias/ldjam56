@@ -15,6 +15,7 @@ import {
     subscribeToGamepadBindingMessages,
 } from './input/gamepad.mjs';
 import { getSearchParam } from './input/search.mjs';
+import { readData, writeData } from './output/storage.mjs';
 
 export async function play() {
     let levelNo = 0;
@@ -26,7 +27,7 @@ export async function play() {
     } catch (err) {}
 
     function updateStats(st) {
-        const text = `level: ${st.level}, viruses: ${st.virusCount}`;
+        const text = `level:${st.level}     score:${st.score}     virus:${st.virusCount}`;
         document.title = text;
         gs.setStatsText(text);
     }
@@ -62,9 +63,7 @@ export async function play() {
             rebindGamepad().then(() => {
                 console.warn('bindings complete');
                 gs.setAlertText('');
-                try {
-                    localStorage.setItem(GP_LS, JSON.stringify(getGamepadBindings()));
-                } catch (err) {}
+                writeData(GP_LS, getGamepadBindings());
             });
         }
         //else if (key === 'd') { window.st = st; debugger } // TODO TEMP
@@ -111,7 +110,7 @@ export async function play() {
     setupGamepad();
 
     try {
-        let b = localStorage.getItem(GP_LS);
+        let b = readData(GP_LS);
         b = JSON.parse(b);
         if (b) {
             setGamepadBindings(b);

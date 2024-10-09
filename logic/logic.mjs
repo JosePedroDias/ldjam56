@@ -10,6 +10,7 @@ import { Pill } from './pill.mjs';
 import { randomColor } from './random.mjs';
 import { setupLevel } from './levels.mjs';
 import { PositionSet, sortByYDescending, posToString, posArrayToString } from './position.mjs';
+import { getScore } from './score.mjs';
 
 const log = () => {};
 //const log = (...args) => console.log(...args);
@@ -33,9 +34,9 @@ export class GameState {
 
     setSpeed() {
         // deltaMult maxLevel
-        const speedMult = 1 + this.level * 0.75/21;
-        this.speedMs = FALL_MS / speedMult;
-        //console.warn(`level ${this.level} -> speed mult: ${speedMult}. ms: ${this.speedMs}`);
+        this.speedMult = 1 + this.level * 0.75/21;
+        this.speedMs = FALL_MS / this.speedMult;
+        //console.warn(`level ${this.level} -> speed mult:${this.speedMult}x. deltaT:${this.speedMs} ms`);
         this.lastMoveT = Date.now() - FALL_MS + 1;
     }
 
@@ -43,7 +44,7 @@ export class GameState {
         this.level= levelNo;
         this.clearBoard();
         setupLevel(this.board, this.level);
-        this.updateVirusCount();
+        this.updateVirusCount(true);
         this.setSpeed();
     }
 
@@ -58,8 +59,21 @@ export class GameState {
         this.currentPill = randomPill();
     }
 
-    updateVirusCount() {
-        this.virusCount = this.board.values().filter((v) => v.isVirus()).length;
+    updateVirusCount(reset) {
+        const count = this.board.values().filter((v) => v.isVirus()).length;
+        if (reset) {
+            this.prevVirusCount = count;
+        }
+        this.virusCount = count;
+
+        const deltaCount = this.prevVirusCount - this.virusCount;
+        if (deltaCount) {
+            const addScore = Math.round( getScore(deltaCount, this.speedMult) );
+            this.score += addScore;
+            //console.log(`dVirus:${deltaCount} ~> +${addScore} to ${this.score}`);
+            this.prevVirusCount = count;
+        }
+
         if (this.virusCount === 0) this.increaseLevel();
         this.onStatsChangedFn(this);
     }

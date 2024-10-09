@@ -62,9 +62,20 @@ when a pill no longer fits in the topmost board row, the game is over
 
 # score system
 
-TODO
+|   virus \ speed |  low | medium |  high |
+|----------------:|-----:|-------:|------:|
+|               1 |  100 |    200 |   300 |
+|               2 |  200 |    400 |   600 |
+|               3 |  400 |    800 |  1200 |
+|               4 |  800 |   1600 |  2400 |
+|               5 | 1600 |   3200 |  4800 |
+|               6 | 3200 |   6400 |  9600 |
 
 
 # head to head variant
 
-TODO
+- two boards exist, controlled by 2 different people
+- the random outcomes are the same for both, ie, the initial board and the sequence of pills
+- clearing the viruses before your opponent grants you a crown (and prompts a new round), as does surviving while your opponent fills his board
+- if you eliminate 2 to 4 (capped to 4) viruses, the other player will receive 2 to 4 random cells??
+- first player to win 3 crowns wins

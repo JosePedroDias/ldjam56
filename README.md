@@ -29,6 +29,7 @@ No images, libraries or timers used.
     - https://www.mariowiki.com/Dr._Mario
     - https://www.mariomayhem.com/downloads/mario_instruction_booklets/Dr_Mario-NES.pdf
     - https://www.youtube.com/watch?v=IHXdtKEHDNU
+    - https://www.twitch.tv/leviticus00
 - JS APIs
     - https://simon.html5.org/dump/html5-canvas-cheat-sheet.html
     - https://developer.mozilla.org/en-US/docs/Web/API/Gamepad_API , https://developer.mozilla.org/en-US/docs/Web/API/Gamepad_API/Using_the_Gamepad_API
