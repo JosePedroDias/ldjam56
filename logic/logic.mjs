@@ -19,16 +19,14 @@ function randomPill() {
 }
 
 export class GameState {
-    constructor(levelNo = 0) {
-        this.level = levelNo;
+    constructor(onStatsChangedFn = () => {}) {
+        this.onStatsChangedFn = onStatsChangedFn;
+        this.level = 0;
         this.board = new PFMatrix(BOARD_W, BOARD_H);
         this.clearBoard();
-        setupLevel(this.board, levelNo);
-        this.updateVirusCount();
         this.score = 0;
         this.paused = false;
         this.isGameOver = false;
-        this.alertText = '';
         //this.markCellsT;
         this.setSpeed();
     }
@@ -41,12 +39,17 @@ export class GameState {
         this.lastMoveT = Date.now() - FALL_MS + 1;
     }
 
-    increaseLevel() {
-        ++this.level;
+    setLevel(levelNo) {
+        this.level= levelNo;
         this.clearBoard();
         setupLevel(this.board, this.level);
         this.updateVirusCount();
         this.setSpeed();
+    }
+
+    increaseLevel() {
+        ++this.level;
+        this.setLevel(this.level);
     }
 
     clearBoard() {
@@ -58,11 +61,11 @@ export class GameState {
     updateVirusCount() {
         this.virusCount = this.board.values().filter((v) => v.isVirus()).length;
         if (this.virusCount === 0) this.increaseLevel();
+        this.onStatsChangedFn(this);
     }
 
     togglePause() {
         this.paused = !this.paused;
-        this.alertText = this.paused ? 'paused' : '';
     }
 
     getPillCollisions() {

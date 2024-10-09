@@ -4,7 +4,7 @@ import {
     S,
 } from './constants.mjs';
 import { GameState } from './logic/logic.mjs';
-import { setupRender } from './output/render.mjs';
+import { GameScreen } from './output/game-screen.mjs';
 import { setupMobile } from './input/mobile.mjs';
 import {
     setupGamepad,
@@ -16,31 +16,31 @@ import {
 } from './input/gamepad.mjs';
 import { getSearchParam } from './input/search.mjs';
 
-let refresh;
-let st;
-
-function updateTitle(st) {
-    document.title = `level: ${st.level}, viruses: ${st.virusCount}`;
-}
-
 export async function play() {
+    let levelNo = 0;
     try {
-        let levelNo = getSearchParam('level');
-        levelNo = parseInt(levelNo, 10);
-        if (!isFinite(levelNo) || levelNo % 1 !== 0 || levelNo < 0 || levelNo > 20) levelNo = 0;
-        st = new GameState(levelNo);
-    } catch (err) {
-        st = new GameState();
+        const lv = getSearchParam('level');
+        lv = parseInt(levelNo, 10);
+        if (!isFinite(lv) || lv % 1 !== 0 || lv < 0 || lv > 20) return;
+        levelNo = lv;
+    } catch (err) {}
+
+    function updateStats(st) {
+        const text = `level: ${st.level}, viruses: ${st.virusCount}`;
+        document.title = text;
+        gs.setStatsText(text);
     }
 
-    updateTitle(st);
-
-    const [mainEl, _refresh] = setupRender(st);
-    refresh = _refresh;
+    const st = new GameState(updateStats);
+    const gs = new GameScreen(st);
+    const refresh = (r) => gs.update(r);
     
+    const mainEl = gs.canvas;
     mainEl.className = 'board';
     mainEl.style.marginLeft = `-${S/2 * st.board.w}px`;
     mainEl.style.marginTop  = `-${S/2 * st.board.h}px`;
+
+    st.setLevel(levelNo);
 
     document.addEventListener('keydown', (ev) => {
         if (ev.altKey || ev.metaKey || ev.ctrlKey) return;
@@ -54,11 +54,14 @@ export async function play() {
         }
         else if (key === KEY_ROT_CW)  st.rotateCW();
         else if (key === KEY_ROT_CCW) st.rotateCCW();
-        else if (key === KEY_PAUSE)   st.togglePause();
+        else if (key === KEY_PAUSE) {
+            st.togglePause();
+            gs.setAlertText(st.paused ? 'game paused' : '');
+        }
         else if (key === KEY_ROT_GP_REBIND) {
             rebindGamepad().then(() => {
                 console.warn('bindings complete');
-                st.alertText = undefined;
+                gs.setAlertText('');
                 try {
                     localStorage.setItem(GP_LS, JSON.stringify(getGamepadBindings()));
                 } catch (err) {}
@@ -72,7 +75,7 @@ export async function play() {
 
     const onTick = () => {
         if (st.isGameOver) {
-            st.alertText = 'game over!';
+            gs.setAlertText('game over!');
             refresh();
             return;
         }
@@ -91,7 +94,6 @@ export async function play() {
                     st.isGameOver = st.applyPill();
                 }
                 st.updateVirusCount();
-                updateTitle(st);
                 st.lastMoveT = t;
             } 
             
@@ -130,7 +132,7 @@ export async function play() {
         else return;
     });
     subscribeToGamepadBindingMessages((msg) => {
-        st.alertText = msg;
+        gs.setAlertText(msg);
     });
 
     setupMobile([

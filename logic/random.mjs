@@ -13,6 +13,22 @@ function mulberry32(a) {
 
 export function deterministicWithSeed(seed) {
     rnd = mulberry32(seed);
+
+    /*const f = mulberry32(seed);
+    rnd = () => {
+        const v = f();
+        console.log(`rnd() ~> ${v}`);
+        return v;
+    }*/
+}
+
+export function deterministicFromValues(values_) {
+    const values = Array.from(values_);
+    rnd = () => {
+        const v = values[0];
+        values.push(values.shift()); // rotate left
+        return v;
+    }
 }
 
 export function resetToDefaultPRNG() {
@@ -27,6 +43,10 @@ export function rndF01() {
 
 export function rndI(n) {
     return Math.floor( n * rnd() );
+
+    /*const v = Math.floor( n * rnd() );
+    console.log(`rndI(${n}) ~> ${v}`);
+    return v;*/
 }
 
 export function randomColor() {

@@ -27,6 +27,7 @@ export function runTests(testsArr) {
         console.log(`✅ ${name}`);
 
         // after each
+        //Array.from(document.querySelectorAll('canvas')).forEach(el => el.parentNode.removeChild(el));
     });
 }
 
